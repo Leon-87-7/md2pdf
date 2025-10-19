@@ -210,6 +210,38 @@ Ensure the input Markdown file exists and the path is correct.
 
 Make sure you have write permissions in the output directory.
 
+### Special characters
+
+Make sure you remove any emojis or none utf-8 characters
+
+## Future features
+
+### Priority Order:
+
+- Preview Mode (Priority 1) ✅ COMPLETED
+  Auto-open PDF after conversion with -p flag
+
+- Auto-detect wkhtmltopdf (Priority 2) ⏳ NEXT
+  Automatically find wkhtmltopdf installation across platforms
+  Check common paths per OS
+  Allow override via flag or environment variable
+
+- Multiple CSS Themes via --theme (Priority 3)
+  Pre-built themes: gradient (current), minimal, corporate, academic, dark
+  Select with --theme flag
+
+- Page Breaks (Priority 4)
+  Support explicit page break markers in Markdown
+  Syntax like <!-- pagebreak --> or similar
+
+- Batch Processing (Priority 5)
+  Convert multiple files to separate PDFs
+  md2pdf file1.md file2.md file3.md → creates file1.pdf, file2.pdf, file3.pdf
+
+- Multiple Input Files (Priority 6)
+  Combine multiple MD files into single PDF
+  md2pdf chapter1.md chapter2.md --merge -o book.pdf
+
 ## License
 
 This project is open source and available for use and modification.
