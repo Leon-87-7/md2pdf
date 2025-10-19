@@ -1,6 +1,9 @@
 #! /usr/bin/env python3
 
 import argparse
+import os
+import platform
+import subprocess
 import sys
 from pathlib import Path
 import markdown
@@ -185,7 +188,28 @@ def get_default_css():
     """
 
 
-def convert_md_to_pdf(input_file, output_file=None, custom_css=None):
+def open_pdf(pdf_path):
+    """Open a PDF file using the default system viewer
+
+    Args:
+        pdf_path (Path): path to the PDF file to open
+    """
+    try:
+        system = platform.system()
+
+        if system == "Windows":
+            os.startfile(str(pdf_path))
+        elif system == "Darwin":  # macOS
+            subprocess.run(["open", str(pdf_path)], check=True)
+        elif system == "Linux":
+            subprocess.run(["xdg-open", str(pdf_path)], check=True)
+        else:
+            print(f"Warning: Unable to open PDF on {system} platform", file=sys.stderr)
+    except Exception as e:
+        print(f"Warning: Could not open PDF: {e}", file=sys.stderr)
+
+
+def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=False):
     """Convert a md file to pdf
 
     Args:
@@ -193,6 +217,7 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None):
         output_file (str, optional): path to the output pdf file.
             If None, will use the same name as input file with .pdf extension.
         custom_css (str, optional): path to a custom css file. If None, default css will be used.
+        preview (bool, optional): if True, open the PDF after generation. Defaults to False.
 
     """
     input_path = Path(input_file)
@@ -247,7 +272,11 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None):
     # Convert HTML to PDF with configuration
     try:
         pdfkit.from_string(full_html, str(output_path), configuration=config)
-        print(f"✓ Successfully converted '{input_file}' to '{output_path}'")
+        print(f"Successfully converted '{input_file}' to '{output_path}'")
+
+        # Open PDF in preview mode if requested
+        if preview:
+            open_pdf(output_path)
     except Exception as e:
         print(f"Error generating PDF: {e}", file=sys.stderr)
         sys.exit(1)
@@ -262,6 +291,7 @@ Example usage:
   md2pdf document.md
   md2pdf input.md -o output.pdf
   md2pdf notes.md --css custom-style.css
+  md2pdf report.md -p
   """,
     )
     parser.add_argument("input", help="Path to the input Markdown file.")
@@ -269,11 +299,17 @@ Example usage:
         "-o", "--output", help="Output PDF file (default: same name as input)"
     )
     parser.add_argument("--css", help="Path to a custom CSS file for styling the PDF.")
+    parser.add_argument(
+        "-p",
+        "--preview",
+        action="store_true",
+        help="Open the PDF with the default viewer after conversion",
+    )
     parser.add_argument("-v", "--version", action="version", version="md2pdf 1.0.0")
 
     args = parser.parse_args()
 
-    convert_md_to_pdf(args.input, args.output, args.css)
+    convert_md_to_pdf(args.input, args.output, args.css, args.preview)
 
 
 if __name__ == "__main__":
