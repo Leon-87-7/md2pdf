@@ -3,6 +3,7 @@
 import argparse
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -234,7 +235,37 @@ def get_default_css():
         border: 3px solid rgba(255, 255, 255, 0.8);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
+
+    .page-break {
+        page-break-after: always;
+        break-after: page;
+        height: 0;
+        margin: 0;
+        padding: 0;
+        border: none;
+    }
     """
+
+
+def process_page_breaks(html_content):
+    """Process HTML comments for page breaks and convert them to CSS page breaks.
+
+    Supports the following markdown comment syntaxes:
+    - <!-- pagebreak -->
+    - <!-- page-break -->
+    - <!-- PAGEBREAK -->
+    - <!-- PAGE-BREAK -->
+
+    Args:
+        html_content (str): HTML content to process
+
+    Returns:
+        str: HTML content with page break comments replaced by div elements
+    """
+    # Pattern matches HTML comments with various page break formats (case-insensitive)
+    pattern = r'<!--\s*page[-_\s]*break\s*-->'
+    replacement = '<div class="page-break"></div>'
+    return re.sub(pattern, replacement, html_content, flags=re.IGNORECASE)
 
 
 def open_pdf(pdf_path):
@@ -316,6 +347,9 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=Fal
     html_content = markdown.markdown(
         md_content, extensions=["extra", "codehilite", "tables", "toc"]
     )
+
+    # Process page breaks
+    html_content = process_page_breaks(html_content)
 
     # Load custom CSS if provided
     if custom_css and Path(custom_css).exists():

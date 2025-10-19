@@ -175,6 +175,42 @@ To create a custom CSS file, you can start with the default styling and modify i
 - Images
 - Horizontal rules
 - Table of contents
+- **Page breaks** (using HTML comments)
+
+### Page Breaks
+
+You can insert explicit page breaks in your Markdown files using HTML comments. This gives you control over where pages start and end in the generated PDF.
+
+**Supported formats:**
+
+```markdown
+<!-- pagebreak -->
+<!-- page-break -->
+<!-- PAGEBREAK -->
+<!-- PAGE-BREAK -->
+```
+
+All formats are case-insensitive and work with or without spaces around "page" and "break".
+
+**Example:**
+
+```markdown
+# Chapter 1
+
+This content will be on the first page.
+
+<!-- pagebreak -->
+
+# Chapter 2
+
+This content will start on a new page.
+
+<!-- page-break -->
+
+# Chapter 3
+
+And this will be on a third page.
+```
 
 ## Requirements
 
@@ -221,13 +257,14 @@ Avoid using emojis or non-UTF-8 characters in output filenames, as they may caus
   Checks system PATH and common installation locations for Windows, macOS, and Linux
   Provides helpful platform-specific error messages if not found
 
-- Multiple CSS Themes via --theme (Priority 3) ⏳ NEXT
+- Page Breaks (Priority 3) ✅ COMPLETED
+  Support explicit page break markers in Markdown
+  Supports multiple formats: <!-- pagebreak -->, <!-- page-break -->, case-insensitive
+  Uses CSS page-break-after to create new pages in PDF
+
+- Multiple CSS Themes via --theme (Priority 4) ⏳ NEXT
   Pre-built themes: gradient (current), minimal, corporate, academic, dark
   Select with --theme flag
-
-- Page Breaks (Priority 4)
-  Support explicit page break markers in Markdown
-  Syntax like <!-- pagebreak --> or similar
 
 - Batch Processing (Priority 5)
   Convert multiple files to separate PDFs
