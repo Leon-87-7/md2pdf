@@ -24,8 +24,8 @@ def get_default_css():
     
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 18pt;
-        line-height: 1.8;
+        font-size: 14pt;
+        line-height: 1.6;
         color: #2c3e50;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 20px;
@@ -38,7 +38,7 @@ def get_default_css():
     }
     
     h1 {
-        font-size: 42pt;
+        font-size: 32pt;
         color: #fff;
         background: linear-gradient(90deg, #667eea, #764ba2);
         padding: 20px;
@@ -46,17 +46,17 @@ def get_default_css():
         text-align: center;
         font-weight: 700;
     }
-    
+
     h2 {
-        font-size: 32pt;
+        font-size: 24pt;
         color: #fff;
         background: linear-gradient(90deg, #4facfe, #00f2fe);
         padding: 15px;
         border-radius: 8px;
     }
-    
+
     h3 {
-        font-size: 24pt;
+        font-size: 18pt;
         color: #2c3e50;
         background: rgba(255, 255, 255, 0.9);
         padding: 10px;
@@ -65,7 +65,7 @@ def get_default_css():
     }
     
     h4 {
-        font-size: 20pt;
+        font-size: 16pt;
         color: #2c3e50;
         background: rgba(255, 255, 255, 0.85);
         padding: 8px;
@@ -78,16 +78,16 @@ def get_default_css():
         padding: 12px;
         border-radius: 5px;
         margin: 10px 0;
-        font-size: 18pt;
+        font-size: 14pt;
     }
-    
+
     ul, ol {
         background: rgba(255, 255, 255, 0.95);
         padding: 15px 15px 15px 40px;
         border-radius: 5px;
         margin: 10px 0;
-        font-size: 18pt;
-        line-height: 1.7;
+        font-size: 14pt;
+        line-height: 1.6;
     }
     
     li {
@@ -98,7 +98,7 @@ def get_default_css():
         border-collapse: collapse;
         width: 100%;
         margin: 20px 0;
-        font-size: 16pt;
+        font-size: 10pt;
         background: rgba(255, 255, 255, 0.95);
         border-radius: 8px;
         overflow: hidden;
@@ -127,11 +127,11 @@ def get_default_css():
         padding: 4px 8px;
         border-radius: 3px;
         font-family: 'Courier New', monospace;
-        font-size: 16pt;
+        font-size: 10pt;
         color: #c7254e;
         border: 1px solid rgba(102, 126, 234, 0.3);
     }
-    
+
     pre {
         background: rgba(255, 255, 255, 0.95);
         border: 1px solid #ddd;
@@ -140,7 +140,7 @@ def get_default_css():
         padding: 18px;
         overflow-x: auto;
         margin: 15px 0;
-        font-size: 15pt;
+        font-size: 10pt;
     }
     
     pre code {
