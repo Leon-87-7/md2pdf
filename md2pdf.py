@@ -271,7 +271,11 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=Fal
 
     # Convert HTML to PDF with configuration
     try:
-        pdfkit.from_string(full_html, str(output_path), configuration=config)
+        # Configure pdfkit options for better compatibility
+        options = {"enable-local-file-access": None, "encoding": "UTF-8", "quiet": ""}
+        pdfkit.from_string(
+            full_html, str(output_path), configuration=config, options=options
+        )
         print(f"Successfully converted '{input_file}' to '{output_path}'")
 
         # Open PDF in preview mode if requested
@@ -279,6 +283,16 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=Fal
             open_pdf(output_path)
     except Exception as e:
         print(f"Error generating PDF: {e}", file=sys.stderr)
+        print("\nTroubleshooting tips:", file=sys.stderr)
+        print(
+            "1. Try using a simpler output filename without special characters like emojis",
+            file=sys.stderr,
+        )
+        print("2. Ensure wkhtmltopdf is properly installed", file=sys.stderr)
+        print(
+            "3. Try removing images or complex formatting from the markdown",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
 
