@@ -14,19 +14,17 @@
 
 ## Prerequisites
 
-Before installing md2pdf, you need to install **wkhtmltopdf**:
+Before using md2pdf, you need to install **wkhtmltopdf**. The tool will automatically detect your installation across all platforms.
 
 ### Windows
 
 Download and install from [wkhtmltopdf downloads](https://wkhtmltopdf.org/downloads.html)
 
-The default installation path is `C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe`
-
 ### Linux
 
 ```bash
 sudo apt-get install wkhtmltopdf  # Debian/Ubuntu
-sudo yum install wkhtmltopdf      # CentOS/RHEL
+sudo dnf install wkhtmltopdf      # Fedora
 ```
 
 ### macOS
@@ -34,6 +32,8 @@ sudo yum install wkhtmltopdf      # CentOS/RHEL
 ```bash
 brew install wkhtmltopdf
 ```
+
+**Note:** md2pdf will automatically detect wkhtmltopdf in standard installation locations or from your system PATH. If not found, it will provide platform-specific installation instructions.
 
 ## Installation
 
@@ -162,16 +162,6 @@ To create a custom CSS file, you can start with the default styling and modify i
 - Links
 - Images
 
-## Configuration
-
-If `wkhtmltopdf` is installed in a different location, edit [md2pdf.py](md2pdf.py#L9-L11):
-
-```python
-config = pdfkit.configuration(
-    wkhtmltopdf="/path/to/wkhtmltopdf"
-)
-```
-
 ## Supported Markdown Features
 
 - Headers (H1-H6)
@@ -197,10 +187,15 @@ config = pdfkit.configuration(
 
 ### wkhtmltopdf not found
 
-If you get an error about wkhtmltopdf not being found, ensure:
+If you get an error about wkhtmltopdf not being found:
 
-1. wkhtmltopdf is installed on your system
-2. The path in the configuration (line 9-11 in [md2pdf.py](md2pdf.py)) matches your installation
+1. Install wkhtmltopdf using the instructions in the Prerequisites section
+2. If installed in a non-standard location, add it to your system PATH
+3. The tool will show platform-specific installation instructions automatically
+
+The auto-detection checks:
+- System PATH (works if wkhtmltopdf is in your PATH)
+- Common installation locations for Windows, macOS, and Linux
 
 ### File not found error
 
@@ -210,9 +205,9 @@ Ensure the input Markdown file exists and the path is correct.
 
 Make sure you have write permissions in the output directory.
 
-### Special characters
+### Special characters in filenames
 
-Make sure you remove any emojis or none utf-8 characters
+Avoid using emojis or non-UTF-8 characters in output filenames, as they may cause issues with wkhtmltopdf.
 
 ## Future features
 
@@ -221,12 +216,12 @@ Make sure you remove any emojis or none utf-8 characters
 - Preview Mode (Priority 1) ✅ COMPLETED
   Auto-open PDF after conversion with -p flag
 
-- Auto-detect wkhtmltopdf (Priority 2) ⏳ NEXT
+- Auto-detect wkhtmltopdf (Priority 2) ✅ COMPLETED
   Automatically find wkhtmltopdf installation across platforms
-  Check common paths per OS
-  Allow override via flag or environment variable
+  Checks system PATH and common installation locations for Windows, macOS, and Linux
+  Provides helpful platform-specific error messages if not found
 
-- Multiple CSS Themes via --theme (Priority 3)
+- Multiple CSS Themes via --theme (Priority 3) ⏳ NEXT
   Pre-built themes: gradient (current), minimal, corporate, academic, dark
   Select with --theme flag
 

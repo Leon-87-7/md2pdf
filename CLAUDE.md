@@ -10,21 +10,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Core Components
 
-The application consists of a single Python module with three main functions:
+The application consists of a single Python module with four main functions:
 
-1. **`get_default_css()`** ([md2pdf.py:14-185](md2pdf.py#L14-L185)): Returns the default CSS styling with gradient backgrounds and professional typography
-2. **`convert_md_to_pdf()`** ([md2pdf.py:188-253](md2pdf.py#L188-L253)): Main conversion logic that:
+1. **`find_wkhtmltopdf()`** ([md2pdf.py:14-54](md2pdf.py#L14-L54)): Auto-detects wkhtmltopdf installation across platforms by checking:
+   - System PATH (using `shutil.which`)
+   - Common installation locations for Windows, macOS, and Linux
+2. **`get_default_css()`**: Returns the default CSS styling with gradient backgrounds and professional typography
+3. **`convert_md_to_pdf()`**: Main conversion logic that:
+   - Verifies wkhtmltopdf is available
    - Reads the Markdown file
    - Converts MD to HTML using the `markdown` library with extensions: `extra`, `codehilite`, `tables`, `toc`
    - Applies CSS styling (default or custom)
    - Generates PDF via `pdfkit`
-3. **`main()`** ([md2pdf.py:256-276](md2pdf.py#L256-L276)): CLI entry point using `argparse`
+4. **`main()`**: CLI entry point using `argparse`
 
 ### Dependencies
 
 - **wkhtmltopdf**: External system dependency required for PDF generation
-  - Configured at [md2pdf.py:9-11](md2pdf.py#L9-L11) with Windows default path
-  - Must be modified for different installation paths or platforms
+  - **Auto-detected** at runtime using `find_wkhtmltopdf()` ([md2pdf.py:14-54](md2pdf.py#L14-L54))
+  - Checks system PATH and common installation locations for Windows, macOS, and Linux
+  - Provides helpful installation instructions if not found
 - **Python packages**: `markdown>=3.4`, `pdfkit>=1.0.0` (see [requirements.txt](requirements.txt))
 
 ## Development Commands
@@ -61,13 +66,17 @@ md2pdf README.md
 # Verify the generated PDF opens correctly
 ```
 
-## Platform-Specific Configuration
+## wkhtmltopdf Installation
 
-The `wkhtmltopdf` path is hardcoded for Windows at [md2pdf.py:9-11](md2pdf.py#L9-L11). When developing on other platforms or with different installation paths:
+The tool automatically detects wkhtmltopdf installations across platforms. If not found, it provides platform-specific installation instructions:
 
-- **macOS**: Typically `/usr/local/bin/wkhtmltopdf` (via Homebrew)
-- **Linux**: Typically `/usr/bin/wkhtmltopdf`
-- Modify the `config` variable to match your system
+- **Windows**: Download from https://wkhtmltopdf.org/downloads.html and install to default location
+- **macOS**: `brew install wkhtmltopdf` or download from the official site
+- **Linux**:
+  - Ubuntu/Debian: `sudo apt-get install wkhtmltopdf`
+  - Fedora: `sudo dnf install wkhtmltopdf`
+
+The detection checks both the system PATH and common installation locations.
 
 ## Styling System
 

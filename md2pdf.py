@@ -3,15 +3,64 @@
 import argparse
 import os
 import platform
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 import markdown
 import pdfkit
 
-config = pdfkit.configuration(
-    wkhtmltopdf="C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe"
-)
+
+def find_wkhtmltopdf():
+    """Auto-detect wkhtmltopdf installation path across different platforms.
+
+    Returns:
+        str: Path to wkhtmltopdf executable if found, None otherwise.
+    """
+    # First, check if wkhtmltopdf is in PATH
+    wkhtmltopdf_path = shutil.which("wkhtmltopdf")
+    if wkhtmltopdf_path:
+        return wkhtmltopdf_path
+
+    # Define common installation paths by platform
+    system = platform.system()
+    common_paths = []
+
+    if system == "Windows":
+        common_paths = [
+            "C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe",
+            "C:/Program Files (x86)/wkhtmltopdf/bin/wkhtmltopdf.exe",
+            Path.home() / "AppData/Local/Programs/wkhtmltopdf/bin/wkhtmltopdf.exe",
+        ]
+    elif system == "Darwin":  # macOS
+        common_paths = [
+            "/usr/local/bin/wkhtmltopdf",
+            "/opt/homebrew/bin/wkhtmltopdf",
+            "/usr/bin/wkhtmltopdf",
+        ]
+    elif system == "Linux":
+        common_paths = [
+            "/usr/bin/wkhtmltopdf",
+            "/usr/local/bin/wkhtmltopdf",
+            "/bin/wkhtmltopdf",
+        ]
+
+    # Check each common path
+    for path in common_paths:
+        path_obj = Path(path)
+        if path_obj.exists() and path_obj.is_file():
+            return str(path_obj)
+
+    return None
+
+
+# Auto-detect wkhtmltopdf path
+wkhtmltopdf_path = find_wkhtmltopdf()
+
+if wkhtmltopdf_path:
+    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+else:
+    config = None
 
 
 def get_default_css():
@@ -220,6 +269,29 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=Fal
         preview (bool, optional): if True, open the PDF after generation. Defaults to False.
 
     """
+    # Check if wkhtmltopdf was found
+    if config is None:
+        print("Error: wkhtmltopdf not found.", file=sys.stderr)
+        print("\nwkhtmltopdf is required for PDF generation but was not found on your system.", file=sys.stderr)
+        print("\nInstallation instructions:", file=sys.stderr)
+
+        system = platform.system()
+        if system == "Windows":
+            print("  - Download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr)
+            print("  - Install to default location (C:/Program Files/wkhtmltopdf/)", file=sys.stderr)
+            print("  - Or add wkhtmltopdf to your system PATH", file=sys.stderr)
+        elif system == "Darwin":
+            print("  - Install via Homebrew: brew install wkhtmltopdf", file=sys.stderr)
+            print("  - Or download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr)
+        elif system == "Linux":
+            print("  - Ubuntu/Debian: sudo apt-get install wkhtmltopdf", file=sys.stderr)
+            print("  - Fedora: sudo dnf install wkhtmltopdf", file=sys.stderr)
+            print("  - Or download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr)
+        else:
+            print("  - Download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr)
+
+        sys.exit(1)
+
     input_path = Path(input_file)
 
     if not input_path.exists():
