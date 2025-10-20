@@ -1,5 +1,6 @@
 # md2pdf
 
+![md2pdf conveyor belt converting Markdown to PDF documents, tacking in md files and outputting PDFs into a folder.](python_md2pdf.v0.2.png)
 **md2pdf** is a simple application that converts Markdown files into PDF documents. It provides an easy-to-use interface for generating professional-looking PDFs from your Markdown content, supporting custom styling and formatting options. Ideal for documentation, reports, and sharing readable documents across platforms.
 
 ## Features
@@ -230,6 +231,7 @@ If you get an error about wkhtmltopdf not being found:
 3. The tool will show platform-specific installation instructions automatically
 
 The auto-detection checks:
+
 - System PATH (works if wkhtmltopdf is in your PATH)
 - Common installation locations for Windows, macOS, and Linux
 
