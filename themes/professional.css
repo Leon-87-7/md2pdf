@@ -1,0 +1,162 @@
+@page {
+    size: A4;
+    margin: 2.5cm;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #2c3e50;
+    background: #ffffff;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.2em;
+    margin-bottom: 0.4em;
+    page-break-after: avoid;
+    color: #1a2332;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+h1 {
+    font-size: 24pt;
+    color: #1a2332;
+    padding: 12pt 0;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 3pt solid #2c3e50;
+    margin-bottom: 1em;
+}
+
+h2 {
+    font-size: 18pt;
+    color: #2c3e50;
+    padding: 8pt 0;
+    font-weight: 600;
+    border-bottom: 1pt solid #6c757d;
+}
+
+h3 {
+    font-size: 14pt;
+    color: #2c3e50;
+    padding: 6pt 0;
+    font-weight: 600;
+}
+
+h4 {
+    font-size: 12pt;
+    color: #495057;
+    padding: 4pt 0;
+    font-weight: 600;
+}
+
+p {
+    margin: 0.5em 0;
+    font-size: 11pt;
+    text-align: justify;
+}
+
+ul, ol {
+    padding: 0 0 0 30px;
+    margin: 0.5em 0;
+    font-size: 11pt;
+}
+
+li {
+    margin: 0.3em 0;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 10pt;
+    background: #ffffff;
+    border: 1pt solid #2c3e50;
+}
+
+th {
+    background: #2c3e50;
+    color: white;
+    padding: 10pt;
+    text-align: left;
+    font-weight: 600;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+td {
+    padding: 8pt;
+    border: 0.5pt solid #adb5bd;
+}
+
+tr:nth-child(even) td {
+    background-color: #f8f9fa;
+}
+
+code {
+    background: #f8f9fa;
+    padding: 2pt 4pt;
+    border-radius: 2pt;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 9pt;
+    color: #495057;
+    border: 0.5pt solid #dee2e6;
+}
+
+pre {
+    background: #f8f9fa;
+    border: 0.5pt solid #dee2e6;
+    border-left: 3pt solid #2c3e50;
+    padding: 12pt;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 9pt;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+    color: #212529;
+    border: none;
+}
+
+blockquote {
+    border-left: 3pt solid #6c757d;
+    padding-left: 1.5em;
+    margin: 1em 0;
+    color: #495057;
+    font-style: italic;
+}
+
+a {
+    color: #2c3e50;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #495057;
+}
+
+hr {
+    border: none;
+    height: 1pt;
+    background: #2c3e50;
+    margin: 1.5em 0;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border: 0.5pt solid #dee2e6;
+}
+
+.page-break {
+    page-break-after: always;
+    break-after: page;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
