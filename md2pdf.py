@@ -8,15 +8,19 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
+
 import markdown
 import pdfkit
 
+__version__ = "0.1.0"
 
-def find_wkhtmltopdf():
+
+def find_wkhtmltopdf() -> Optional[str]:
     """Auto-detect wkhtmltopdf installation path across different platforms.
 
     Returns:
-        str: Path to wkhtmltopdf executable if found, None otherwise.
+        Path to wkhtmltopdf executable if found, None otherwise.
     """
     # First, check if wkhtmltopdf is in PATH
     wkhtmltopdf_path = shutil.which("wkhtmltopdf")
@@ -55,199 +59,32 @@ def find_wkhtmltopdf():
     return None
 
 
-# Auto-detect wkhtmltopdf path
-wkhtmltopdf_path = find_wkhtmltopdf()
+def _get_themes_directory() -> Path:
+    """Get the path to the themes directory.
 
-if wkhtmltopdf_path:
-    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
-else:
-    config = None
-
-
-def get_default_css():
-    """return default css for pdf rendering"""
-    return """
-    @page {
-        size: A4;
-        margin: 2cm;
-    }
-    
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 14pt;
-        line-height: 1.6;
-        color: #2c3e50;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-    }
-    
-    h1, h2, h3, h4, h5, h6 {
-        margin-top: 1.5em;
-        margin-bottom: 0.5em;
-        page-break-after: avoid;
-    }
-    
-    h1 {
-        font-size: 32pt;
-        color: #fff;
-        background: linear-gradient(90deg, #667eea, #764ba2);
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        font-weight: 700;
-    }
-
-    h2 {
-        font-size: 24pt;
-        color: #fff;
-        background: linear-gradient(90deg, #4facfe, #00f2fe);
-        padding: 15px;
-        border-radius: 8px;
-    }
-
-    h3 {
-        font-size: 18pt;
-        color: #2c3e50;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 10px;
-        border-radius: 5px;
-        font-weight: 600;
-    }
-    
-    h4 {
-        font-size: 16pt;
-        color: #2c3e50;
-        background: rgba(255, 255, 255, 0.85);
-        padding: 8px;
-        border-radius: 5px;
-        font-weight: 600;
-    }
-    
-    p {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 12px;
-        border-radius: 5px;
-        margin: 10px 0;
-        font-size: 14pt;
-    }
-
-    ul, ol {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 15px 15px 15px 40px;
-        border-radius: 5px;
-        margin: 10px 0;
-        font-size: 14pt;
-        line-height: 1.6;
-    }
-    
-    li {
-        margin: 10px 0;
-    }
-    
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        margin: 20px 0;
-        font-size: 10pt;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    th {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        padding: 14px;
-        text-align: left;
-        font-weight: 600;
-    }
-    
-    td {
-        padding: 12px;
-        border: 1px solid #ddd;
-        background: rgba(255, 255, 255, 0.95);
-    }
-    
-    tr:nth-child(even) td {
-        background-color: rgba(248, 249, 250, 0.95);
-    }
-    
-    code {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 4px 8px;
-        border-radius: 3px;
-        font-family: 'Courier New', monospace;
-        font-size: 10pt;
-        color: #c7254e;
-        border: 1px solid rgba(102, 126, 234, 0.3);
-    }
-
-    pre {
-        background: rgba(255, 255, 255, 0.95);
-        border: 1px solid #ddd;
-        border-left: 5px solid #667eea;
-        border-radius: 5px;
-        padding: 18px;
-        overflow-x: auto;
-        margin: 15px 0;
-        font-size: 10pt;
-    }
-    
-    pre code {
-        background: none;
-        padding: 0;
-        color: #333;
-        border: none;
-    }
-    
-    blockquote {
-        border-left: 5px solid #667eea;
-        padding-left: 2em;
-        margin: 15px 0;
-        color: #555;
-        font-style: italic;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 18px 18px 18px 2em;
-        border-radius: 5px;
-    }
-    
-    a {
-        color: #4facfe;
-        text-decoration: none;
-        font-weight: 500;
-    }
-    
-    a:hover {
-        text-decoration: underline;
-    }
-    
-    hr {
-        border: none;
-        height: 3px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe);
-        margin: 25px 0;
-    }
-    
-    img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        border: 3px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .page-break {
-        page-break-after: always;
-        break-after: page;
-        height: 0;
-        margin: 0;
-        padding: 0;
-        border: none;
-    }
+    Returns:
+        Path to the themes directory (same location as this script).
     """
+    # Get the directory where this script is located
+    script_dir = Path(__file__).parent
+    return script_dir / "themes"
 
 
-def process_page_breaks(html_content):
+def _list_available_themes() -> list[str]:
+    """List all available theme names.
+
+    Returns:
+        List of theme names (without .css extension).
+    """
+    themes_dir = _get_themes_directory()
+    if not themes_dir.exists():
+        return []
+
+    # Get all .css files and remove extension
+    return [f.stem for f in themes_dir.glob("*.css")]
+
+
+def process_page_breaks(html_content: str) -> str:
     """Process HTML comments for page breaks and convert them to CSS page breaks.
 
     Supports the following markdown comment syntaxes:
@@ -257,22 +94,22 @@ def process_page_breaks(html_content):
     - <!-- PAGE-BREAK -->
 
     Args:
-        html_content (str): HTML content to process
+        html_content: HTML content to process
 
     Returns:
-        str: HTML content with page break comments replaced by div elements
+        HTML content with page break comments replaced by div elements
     """
     # Pattern matches HTML comments with various page break formats (case-insensitive)
-    pattern = r'<!--\s*page[-_\s]*break\s*-->'
+    pattern = r"<!--\s*page[-_\s]*break\s*-->"
     replacement = '<div class="page-break"></div>'
     return re.sub(pattern, replacement, html_content, flags=re.IGNORECASE)
 
 
-def open_pdf(pdf_path):
-    """Open a PDF file using the default system viewer
+def open_pdf(pdf_path: Path) -> None:
+    """Open a PDF file using the default system viewer.
 
     Args:
-        pdf_path (Path): path to the PDF file to open
+        pdf_path: Path to the PDF file to open
     """
     try:
         system = platform.system()
@@ -285,49 +122,181 @@ def open_pdf(pdf_path):
             subprocess.run(["xdg-open", str(pdf_path)], check=True)
         else:
             print(f"Warning: Unable to open PDF on {system} platform", file=sys.stderr)
-    except Exception as e:
+    except (OSError, subprocess.CalledProcessError) as e:
         print(f"Warning: Could not open PDF: {e}", file=sys.stderr)
 
 
-def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=False):
-    """Convert a md file to pdf
+def _print_wkhtmltopdf_installation_instructions() -> None:
+    """Print platform-specific installation instructions for wkhtmltopdf."""
+    print("Error: wkhtmltopdf not found.", file=sys.stderr)
+    print(
+        "\nwkhtmltopdf is required for PDF generation but was not found on your system.",
+        file=sys.stderr,
+    )
+    print("\nInstallation instructions:", file=sys.stderr)
+
+    system = platform.system()
+    if system == "Windows":
+        print(
+            "  - Download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr
+        )
+        print(
+            "  - Install to default location (C:/Program Files/wkhtmltopdf/)",
+            file=sys.stderr,
+        )
+        print("  - Or add wkhtmltopdf to your system PATH", file=sys.stderr)
+    elif system == "Darwin":
+        print("  - Install via Homebrew: brew install wkhtmltopdf", file=sys.stderr)
+        print(
+            "  - Or download from: https://wkhtmltopdf.org/downloads.html",
+            file=sys.stderr,
+        )
+    elif system == "Linux":
+        print("  - Ubuntu/Debian: sudo apt-get install wkhtmltopdf", file=sys.stderr)
+        print("  - Fedora: sudo dnf install wkhtmltopdf", file=sys.stderr)
+        print(
+            "  - Or download from: https://wkhtmltopdf.org/downloads.html",
+            file=sys.stderr,
+        )
+    else:
+        print(
+            "  - Download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr
+        )
+
+
+def _validate_input_file(input_file: str) -> Path:
+    """Validate the input markdown file.
 
     Args:
-        input_file (str): path to the input md file
-        output_file (str, optional): path to the output pdf file.
-            If None, will use the same name as input file with .pdf extension.
-        custom_css (str, optional): path to a custom css file. If None, default css will be used.
-        preview (bool, optional): if True, open the PDF after generation. Defaults to False.
+        input_file: Path to the input markdown file
 
+    Returns:
+        Validated Path object
+
+    Raises:
+        SystemExit: If validation fails
     """
-    # Check if wkhtmltopdf was found
-    if config is None:
-        print("Error: wkhtmltopdf not found.", file=sys.stderr)
-        print("\nwkhtmltopdf is required for PDF generation but was not found on your system.", file=sys.stderr)
-        print("\nInstallation instructions:", file=sys.stderr)
-
-        system = platform.system()
-        if system == "Windows":
-            print("  - Download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr)
-            print("  - Install to default location (C:/Program Files/wkhtmltopdf/)", file=sys.stderr)
-            print("  - Or add wkhtmltopdf to your system PATH", file=sys.stderr)
-        elif system == "Darwin":
-            print("  - Install via Homebrew: brew install wkhtmltopdf", file=sys.stderr)
-            print("  - Or download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr)
-        elif system == "Linux":
-            print("  - Ubuntu/Debian: sudo apt-get install wkhtmltopdf", file=sys.stderr)
-            print("  - Fedora: sudo dnf install wkhtmltopdf", file=sys.stderr)
-            print("  - Or download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr)
-        else:
-            print("  - Download from: https://wkhtmltopdf.org/downloads.html", file=sys.stderr)
-
-        sys.exit(1)
-
     input_path = Path(input_file)
 
     if not input_path.exists():
         print(f"Error: Input file '{input_file}' does not exist.", file=sys.stderr)
         sys.exit(1)
+
+    if not input_path.is_file():
+        print(f"Error: '{input_file}' is not a file.", file=sys.stderr)
+        sys.exit(1)
+
+    # Optional: Validate extension (warn, don't error)
+    if input_path.suffix.lower() not in [".md", ".markdown", ".txt"]:
+        print(
+            f"Warning: '{input_file}' does not have a markdown extension (.md, .markdown)",
+            file=sys.stderr,
+        )
+
+    # Check readability
+    if not os.access(input_path, os.R_OK):
+        print(f"Error: No read permission for '{input_file}'.", file=sys.stderr)
+        sys.exit(1)
+
+    return input_path
+
+
+def _load_css(custom_css: Optional[str] = None, theme: str = "default") -> str:
+    """Load CSS content from custom file, theme, or default.
+
+    Args:
+        custom_css: Path to custom CSS file, or None to use theme
+        theme: Theme name to use (default: "default")
+
+    Returns:
+        CSS content as string
+
+    Raises:
+        SystemExit: If CSS file is invalid or unreadable
+    """
+    # --css flag takes precedence over --theme
+    if custom_css:
+        css_path = Path(custom_css).resolve()
+
+        # Validate it's a file and exists
+        if not css_path.exists():
+            print(f"Error: CSS file '{custom_css}' does not exist.", file=sys.stderr)
+            sys.exit(1)
+
+        if not css_path.is_file():
+            print(f"Error: CSS file '{custom_css}' is not a file.", file=sys.stderr)
+            sys.exit(1)
+
+        # Warn if extension is not .css
+        if css_path.suffix.lower() != ".css":
+            print(
+                f"Warning: '{custom_css}' does not have .css extension", file=sys.stderr
+            )
+
+        try:
+            with open(css_path, "r", encoding="utf-8") as f:
+                return f.read()
+        except (IOError, PermissionError, UnicodeDecodeError) as e:
+            print(f"Error reading CSS file: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        # Load from themes directory
+        themes_dir = _get_themes_directory()
+        theme_path = themes_dir / f"{theme}.css"
+
+        if not theme_path.exists():
+            available_themes = _list_available_themes()
+            print(f"Error: Theme '{theme}' not found.", file=sys.stderr)
+            if available_themes:
+                print(f"Available themes: {', '.join(available_themes)}", file=sys.stderr)
+            else:
+                print("No themes found in themes directory.", file=sys.stderr)
+            sys.exit(1)
+
+        try:
+            with open(theme_path, "r", encoding="utf-8") as f:
+                return f.read()
+        except (IOError, PermissionError, UnicodeDecodeError) as e:
+            print(f"Error reading theme file: {e}", file=sys.stderr)
+            sys.exit(1)
+
+
+def convert_md_to_pdf(
+    input_file: str,
+    output_file: Optional[str] = None,
+    custom_css: Optional[str] = None,
+    theme: str = "default",
+    preview: bool = False,
+) -> None:
+    """Convert a Markdown file to PDF.
+
+    Args:
+        input_file: Path to the input Markdown file
+        output_file: Path to the output PDF file (optional, defaults to input name with .pdf)
+        custom_css: Path to a custom CSS file (optional, takes precedence over theme)
+        theme: Theme name to use (default: "default", ignored if custom_css is provided)
+        preview: Whether to open the PDF after generation (default: False)
+
+    Raises:
+        SystemExit: If conversion fails or dependencies are missing
+    """
+    # Warn if both custom_css and theme are specified
+    if custom_css and theme != "default":
+        print(
+            f"Warning: Both --css and --theme specified. Using custom CSS file, ignoring theme '{theme}'.",
+            file=sys.stderr,
+        )
+    # Find and configure wkhtmltopdf when needed (lazy initialization)
+    wkhtmltopdf_path = find_wkhtmltopdf()
+
+    if wkhtmltopdf_path is None:
+        _print_wkhtmltopdf_installation_instructions()
+        sys.exit(1)
+
+    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+    # Validate input file
+    input_path = _validate_input_file(input_file)
 
     # Determine output file path
     if output_file is None:
@@ -339,7 +308,7 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=Fal
     try:
         with open(input_path, "r", encoding="utf-8") as f:
             md_content = f.read()
-    except Exception as e:
+    except (IOError, PermissionError, UnicodeDecodeError) as e:
         print(f"Error reading input file: {e}", file=sys.stderr)
         sys.exit(1)
 
@@ -351,12 +320,8 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=Fal
     # Process page breaks
     html_content = process_page_breaks(html_content)
 
-    # Load custom CSS if provided
-    if custom_css and Path(custom_css).exists():
-        with open(custom_css, "r", encoding="utf-8") as f:
-            css_content = f.read()
-    else:
-        css_content = get_default_css()
+    # Load CSS (custom, theme, or default)
+    css_content = _load_css(custom_css, theme)
 
     # Wrap in basic HTML content with embedded CSS
     full_html = f"""
@@ -387,14 +352,26 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=Fal
         # Open PDF in preview mode if requested
         if preview:
             open_pdf(output_path)
+
+    except (IOError, OSError, PermissionError) as e:
+        print(f"Error writing PDF file: {e}", file=sys.stderr)
+        print(
+            "Check that you have write permissions for the output directory.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     except Exception as e:
         print(f"Error generating PDF: {e}", file=sys.stderr)
         print("\nTroubleshooting tips:", file=sys.stderr)
         print(
-            "1. Try using a simpler output filename without special characters like emojis",
+            "1. Try using a simpler output filename without special characters",
             file=sys.stderr,
         )
-        print("2. Ensure wkhtmltopdf is properly installed", file=sys.stderr)
+        print(
+            "2. Ensure wkhtmltopdf is properly installed and accessible",
+            file=sys.stderr,
+        )
         print(
             "3. Try removing images or complex formatting from the markdown",
             file=sys.stderr,
@@ -402,34 +379,48 @@ def convert_md_to_pdf(input_file, output_file=None, custom_css=None, preview=Fal
         sys.exit(1)
 
 
-def main():
+def main() -> None:
+    """Main entry point for the CLI application."""
     parser = argparse.ArgumentParser(
         description="Convert Markdown files to PDF with custom styles.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Example usage:
-  md2pdf document.md
-  md2pdf input.md -o output.pdf
-  md2pdf notes.md --css custom-style.css
-  md2pdf report.md -p
+  md2pdf document.md                                    # Use default theme
+  md2pdf input.md -o output.pdf                        # Specify output file
+  md2pdf notes.md --theme dark                         # Use dark theme
+  md2pdf notes.md --theme minimal                      # Use minimal theme
+  md2pdf notes.md --css custom-style.css               # Use custom CSS file
+  md2pdf report.md --theme dark -p                     # Use dark theme and preview
+  md2pdf report.md --theme minimal --css custom.css    # CSS takes precedence (with warning)
   """,
     )
     parser.add_argument("input", help="Path to the input Markdown file.")
     parser.add_argument(
         "-o", "--output", help="Output PDF file (default: same name as input)"
     )
-    parser.add_argument("--css", help="Path to a custom CSS file for styling the PDF.")
+    parser.add_argument(
+        "--theme",
+        default="default",
+        help="Theme to use for styling (default: default). Ignored if --css is specified.",
+    )
+    parser.add_argument(
+        "--css",
+        help="Path to a custom CSS file for styling the PDF. Takes precedence over --theme.",
+    )
     parser.add_argument(
         "-p",
         "--preview",
         action="store_true",
         help="Open the PDF with the default viewer after conversion",
     )
-    parser.add_argument("-v", "--version", action="version", version="md2pdf 1.0.0")
+    parser.add_argument(
+        "-v", "--version", action="version", version=f"md2pdf {__version__}"
+    )
 
     args = parser.parse_args()
 
-    convert_md_to_pdf(args.input, args.output, args.css, args.preview)
+    convert_md_to_pdf(args.input, args.output, args.css, args.theme, args.preview)
 
 
 if __name__ == "__main__":
