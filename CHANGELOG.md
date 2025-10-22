@@ -8,16 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Claude Code agent configurations and artifacts for AI-assisted development
 - Smart commit slash command from claude-code-templates
 - Project documentation image in README
 
 ### Changed
+
 - CSS styling improvements for better PDF rendering
 
-## [0.1.0] - 2025-10-22
+## [0.1.0] - 2025-10-20
 
 ### Added
+
 - Initial release of md2pdf CLI tool
 - Markdown to PDF conversion with professional styling
 - Cross-platform wkhtmltopdf auto-detection for Windows, macOS, and Linux
@@ -40,11 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Extra features (footnotes, definition lists, etc.)
 
 ### Fixed
+
 - Text size rendering issues in generated PDFs
 - Error handling improvements for missing wkhtmltopdf installations
 - Better error messages with platform-specific installation instructions
 
 ### Documentation
+
 - Comprehensive README with usage examples
 - Installation instructions for all platforms
 - Custom CSS styling guide
