@@ -104,8 +104,6 @@ def test_convert_basic():
 
 def test_validation_errors():
     """Test input validation."""
-    import sys
-    from io import StringIO
 
     # Test non-existent file
     try:
