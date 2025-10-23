@@ -3,6 +3,7 @@ name = "md2pdf"
 version = "0.2.0"
 description = "Convert Markdown files to PDF with beautiful themes"
 readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.9"
 dependencies = [
     "markdown>=3.4",
