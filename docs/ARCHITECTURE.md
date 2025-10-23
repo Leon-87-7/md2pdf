@@ -473,6 +473,55 @@ Configuration centralized in `config.py`:
 
 ## Testing Strategy
 
+md2pdf includes a **comprehensive pytest-based test suite** with **95 tests** achieving **84% code coverage**.
+
+### Test Suite Structure
+
+```
+tests/
+├── __init__.py              # Test package marker
+├── conftest.py              # Shared fixtures and configuration
+├── test_cli.py              # CLI interface tests (19 tests)
+├── test_config.py           # Configuration module tests (9 tests)
+├── test_file_operations.py  # File I/O tests (17 tests)
+├── test_markdown_processor.py # Markdown processing tests (20 tests)
+├── test_pdf_engine.py       # PDF generation tests (15 tests)
+└── test_theme_manager.py    # Theme management tests (15 tests)
+```
+
+### Coverage by Module
+
+| Module | Coverage | Tests |
+|--------|----------|-------|
+| `__init__.py` | 100% | ✓ |
+| `config.py` | 100% | 9 |
+| `markdown_processor.py` | 100% | 20 |
+| `pdf_engine.py` | 100% | 15 |
+| `cli.py` | 97% | 19 |
+| `file_operations.py` | 89% | 17 |
+| `theme_manager.py` | 83% | 15 |
+| `core.py` | 18% | - |
+| **TOTAL** | **84%** | **95** |
+
+### Running Tests
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run without coverage
+pytest --no-cov
+
+# Run specific test file
+pytest tests/test_cli.py
+```
+
 ### Unit Testing
 Each module can be tested independently:
 
@@ -487,7 +536,8 @@ def test_list_themes():
 def test_markdown_to_html():
     md = "# Hello"
     html = markdown_processor.markdown_to_html(md)
-    assert "<h1>Hello</h1>" in html
+    assert "<h1" in html
+    assert "Hello</h1>" in html
 
 # Test file_operations (with mocking)
 def test_validate_input_file(tmp_path):
@@ -516,6 +566,24 @@ def test_full_conversion(tmp_path):
 
     assert output_file.exists()
 ```
+
+### Mocking Strategy
+
+Tests use `unittest.mock` and `pytest-mock` to isolate external dependencies:
+
+```python
+@patch("pdfkit.from_string")
+def test_pdf_generation(mock_from_string):
+    mock_from_string.return_value = None
+    # Test without actually calling wkhtmltopdf
+
+@patch("platform.system")
+def test_platform_detection(mock_system):
+    mock_system.return_value = "Linux"
+    # Test platform-specific behavior
+```
+
+For more details, see the [Testing Documentation](TESTING.md).
 
 <!-- pagebreak -->
 
