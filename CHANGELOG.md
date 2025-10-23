@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-10-23
+
 ### Added
 
 - **Modular package architecture** - Refactored from single file to clean multi-module structure
@@ -161,5 +163,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Future features roadmap
 - CLAUDE.md for AI development assistance
 
-[unreleased]: https://github.com/leon-87-7/md2pdf/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/leon-87-7/md2pdf/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/leon-87-7/md2pdf/compare/v0.1.0...v0.2.1
 [0.1.0]: https://github.com/leon-87-7/md2pdf/releases/tag/v0.1.0
