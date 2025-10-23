@@ -1,7 +1,17 @@
 [project]
 name = "md2pdf"
-version = "0.1.0"
-description = "A simple markdown to PDF CLI converter"
+version = "0.2.0"
+description = "Convert Markdown files to PDF with beautiful themes"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.9"
+dependencies = [
+    "markdown>=3.4",
+    "pdfkit>=1.0.0",
+]
+
+[project.scripts]
+md2pdf = "md2pdf.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
