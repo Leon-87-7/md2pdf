@@ -17,6 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `markdown_processor.py` - Markdown to HTML conversion
   - `theme_manager.py` - Theme and CSS management
   - `file_operations.py` - File I/O operations
+  - `exceptions.py` - Custom exception hierarchy
+- **Custom exception hierarchy** for professional error handling
+  - `Md2PdfError` - Base exception for all md2pdf errors
+  - `WkhtmltopdfNotFoundError` - Raised when wkhtmltopdf is not found
+  - `ConversionError` - Raised when PDF conversion fails
+  - `FileOperationError` - Raised when file operations fail
+  - `ThemeNotFoundError` - Raised when theme is not found (includes available themes list)
+  - `CSSNotFoundError` - Raised when custom CSS file is not found
+  - `InvalidInputError` - Raised when input validation fails
+  - All exceptions exported in public API for programmatic use
+  - Proper exception chaining with `from e` for debugging
 - **Theme system** for flexible PDF styling (5 pre-built themes)
   - `default` - Gradient theme with modern styling
   - `dark` - Dark mode theme for reduced eye strain
@@ -26,13 +37,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `--theme` CLI argument for selecting themes
   - `--theme-list` / `-thl` flag to list all available themes
   - Support for external CSS theme files in `themes/` directory
+  - **Early theme validation** - Validates theme exists before conversion starts
+  - Helpful error messages with list of available themes when theme not found
 - **Comprehensive test suite** with pytest
-  - 95 tests across 6 test modules
-  - 84% code coverage
+  - 116 tests across 7 test modules (including new test_core.py)
+  - 94% code coverage (exceeds 85% target)
   - Unit tests for all modules
-  - Integration tests for CLI
+  - Integration tests for CLI and core orchestrator
   - Proper mocking of external dependencies
   - Test fixtures for markdown and CSS files
+  - Comprehensive error path testing for all exception types
+  - Tests verify exception handling throughout the stack
 - **Testing documentation** (`docs/TESTING.md`)
   - How to run tests and generate coverage reports
   - Writing new tests and best practices
@@ -72,9 +87,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored wkhtmltopdf detection to use lazy initialization
   - No longer initialized at module import time
   - Configured only when needed during conversion
-- Improved error handling with specific exception types
+- **BREAKING**: Improved error handling with custom exception hierarchy
+  - Replaced all `sys.exit()` calls in library code with exceptions
+  - Library functions now raise exceptions, CLI handles system exit
+  - Better separation between library and CLI concerns
+  - Exceptions include helpful troubleshooting tips and context
   - `IOError`, `PermissionError`, `UnicodeDecodeError` for file operations
-  - `OSError`, `subprocess.CalledProcessError` for system operations
+  - `OSError`, `subprocess.CalledProcessError` wrapped in ConversionError
 - Enhanced input validation
   - File existence and type checking
   - Permission verification with `os.access()`
@@ -89,10 +108,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Version consistency throughout the codebase
+- Version consistency throughout the codebase (synced to 0.2.1 in pyproject.toml)
 - Error messages now include troubleshooting tips for common issues
 - Input argument handling (now optional when using --theme-list)
 - Theme CSS margin and padding for proper PDF layout
+- Missing return type hint in `create_pdf_configuration()` function
+- Inappropriate use of `sys.exit()` in library code (now uses exceptions)
+- Missing test coverage for core orchestrator module
+- Theme validation now happens early before conversion starts
+- CLI error handling now properly catches and displays all Md2PdfError exceptions
 
 ### Removed
 
