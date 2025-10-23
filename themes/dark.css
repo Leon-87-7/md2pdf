@@ -1,6 +1,14 @@
 @page {
     size: A4;
-    margin: 2cm;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    background-color: #1a1a1a;
 }
 
 body {
@@ -8,11 +16,16 @@ body {
     font-size: 14pt;
     line-height: 1.6;
     color: #e0e0e0;
-    background: #1a1a1a;
-    padding: 20px;
+    background-color: #1a1a1a;
+    padding: 2cm;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin-top: 1.5em;
     margin-bottom: 0.5em;
     page-break-after: avoid;
@@ -65,7 +78,8 @@ p {
     color: #e0e0e0;
 }
 
-ul, ol {
+ul,
+ol {
     background: #2d2d2d;
     padding: 15px 15px 15px 40px;
     border-radius: 5px;
@@ -176,7 +190,7 @@ img {
     page-break-after: always;
     break-after: page;
     height: 0;
-    margin: 0;
+    margin: 2cm 0;
     padding: 0;
     border: none;
 }

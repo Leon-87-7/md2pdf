@@ -1,6 +1,6 @@
 @page {
     size: A4;
-    margin: 2cm;
+    margin: 0;
 }
 
 body {
@@ -9,10 +9,15 @@ body {
     line-height: 1.6;
     color: #2c3e50;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+    padding: 2cm;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin-top: 1.5em;
     margin-bottom: 0.5em;
     page-break-after: avoid;
@@ -20,7 +25,7 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
     font-size: 32pt;
-    color: #fff;
+    color: #2c3e50;
     background: linear-gradient(90deg, #667eea, #764ba2);
     padding: 20px;
     border-radius: 10px;
@@ -30,7 +35,7 @@ h1 {
 
 h2 {
     font-size: 24pt;
-    color: #fff;
+    color: #2c3e50;
     background: linear-gradient(90deg, #4facfe, #00f2fe);
     padding: 15px;
     border-radius: 8px;
@@ -62,7 +67,8 @@ p {
     font-size: 14pt;
 }
 
-ul, ol {
+ul,
+ol {
     background: rgba(255, 255, 255, 0.95);
     padding: 15px 15px 15px 40px;
     border-radius: 5px;
@@ -87,7 +93,7 @@ table {
 
 th {
     background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+    color: #2c3e50;
     padding: 14px;
     text-align: left;
     font-weight: 600;
@@ -171,7 +177,7 @@ img {
     page-break-after: always;
     break-after: page;
     height: 0;
-    margin: 0;
+    margin: 2cm 0;
     padding: 0;
     border: none;
 }
