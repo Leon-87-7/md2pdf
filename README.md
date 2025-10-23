@@ -6,6 +6,8 @@
 ## Features
 
 - Convert Markdown to PDF with a single command
+- **Batch processing** - convert multiple files to separate PDFs
+- **Merge mode** - combine multiple Markdown files into a single PDF
 - **5 pre-built themes** (default, dark, light, minimal, professional)
 - **Theme discovery** with `--theme-list` flag to list all available themes
 - Beautiful default styling with professional typography
@@ -18,7 +20,7 @@
 - **Preview mode** (`-p`) to auto-open PDFs after generation
 - **Auto-detection** of wkhtmltopdf across all platforms
 - **Modular architecture** with clean separation of concerns
-- **Comprehensive test suite** with 95 tests and 84% code coverage
+- **Comprehensive test suite** with 116 tests and 69% code coverage
 
 ## Prerequisites
 
@@ -120,24 +122,62 @@ md2pdf document.md -p
 
 This will generate the PDF and immediately open it in your system's default PDF viewer.
 
+### Batch Processing
+
+Convert multiple Markdown files to separate PDFs:
+
+```bash
+md2pdf file1.md file2.md file3.md
+```
+
+This creates `file1.pdf`, `file2.pdf`, and `file3.pdf` in the same directories as their source files.
+
+Specify an output directory for all PDFs:
+
+```bash
+md2pdf *.md --output-dir pdfs/
+```
+
+### Merge Mode
+
+Combine multiple Markdown files into a single PDF:
+
+```bash
+md2pdf chapter1.md chapter2.md chapter3.md --merge -o book.pdf
+```
+
+Each source file becomes a section in the merged PDF, with automatic page breaks between sections.
+
+Disable automatic page breaks between merged sections:
+
+```bash
+md2pdf intro.md content.md --merge --no-auto-break -o document.pdf
+```
+
 ### Command Line Options
 
 ```
-usage: md2pdf [-h] [-o OUTPUT] [--theme THEME] [--theme-list] [--css CSS] [-p] [-v] [input]
+usage: md2pdf [-h] [-o OUTPUT] [--output-dir OUTPUT_DIR] [--theme THEME]
+              [--theme-list] [--css CSS] [-p] [--merge] [--no-auto-break] [-v]
+              input [input ...]
 
 positional arguments:
-  input                 Path to the input Markdown file
+  input                 Path to input Markdown file(s). Multiple files triggers batch mode
 
 optional arguments:
   -h, --help            show this help message and exit
   -o OUTPUT, --output OUTPUT
-                        Output PDF file (default: same name as input)
+                        Output PDF file (single file mode or merge mode only)
+  --output-dir OUTPUT_DIR
+                        Output directory for batch mode
   --theme THEME         Theme to use for styling (default: default)
                         Ignored if --css is specified
   --theme-list, -thl    List all available themes and exit
   --css CSS             Path to a custom CSS file for styling the PDF
                         Takes precedence over --theme
   -p, --preview         Open the PDF with the default viewer after conversion
+  --merge               Merge multiple input files into a single PDF (requires 2+ files)
+  --no-auto-break       Disable automatic page breaks between merged documents
   -v, --version         show program's version number and exit
 ```
 
@@ -185,6 +225,34 @@ md2pdf document.md -p
 
 ```bash
 md2pdf presentation.md --theme dark -p
+```
+
+### Example 8: Batch Processing
+
+Convert multiple files to separate PDFs:
+
+```bash
+md2pdf chapter1.md chapter2.md chapter3.md
+```
+
+Convert with output directory:
+
+```bash
+md2pdf docs/*.md --output-dir pdfs/ --theme professional
+```
+
+### Example 9: Merge Files into Single PDF
+
+Merge with automatic page breaks between sections:
+
+```bash
+md2pdf intro.md methods.md results.md conclusion.md --merge -o research_paper.pdf
+```
+
+Merge without page breaks:
+
+```bash
+md2pdf part1.md part2.md --merge --no-auto-break -o continuous_document.pdf --theme dark
 ```
 
 ## Themes
@@ -353,7 +421,7 @@ And this will be on a third page.
 
 ### Running Tests
 
-md2pdf includes a comprehensive test suite with **95 tests** and **84% code coverage**.
+md2pdf includes a comprehensive test suite with **116 tests** and **69% code coverage**.
 
 Install development dependencies:
 
@@ -435,13 +503,17 @@ If you get an error about a theme not being found:
   Custom CSS takes precedence over themes
   Type hints and improved error handling throughout codebase
 
-- Batch Processing (Priority 5)
+- Batch Processing (Priority 5) ✅ COMPLETED
   Convert multiple files to separate PDFs
   md2pdf file1.md file2.md file3.md → creates file1.pdf, file2.pdf, file3.pdf
+  Support for --output-dir to specify output directory for batch conversions
+  Efficient processing with shared setup for all files
 
-- Multiple Input Files (Priority 6)
-  Combine multiple MD files into single PDF
+- Merge Mode (Priority 6) ✅ COMPLETED
+  Combine multiple MD files into single PDF with --merge flag
   md2pdf chapter1.md chapter2.md --merge -o book.pdf
+  Automatic page breaks between sections (optional with --no-auto-break)
+  Section headers showing source filenames
 
 ## License
 

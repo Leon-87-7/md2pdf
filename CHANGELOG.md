@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-10-23
+
+### Added
+
+- **Batch processing mode** - Convert multiple Markdown files to separate PDFs in one command
+  - Automatic detection when multiple input files are provided
+  - `--output-dir` flag to specify output directory for batch conversions
+  - Efficient processing with shared setup (PDF engine and CSS loaded once)
+  - Progress tracking with [OK]/[FAILED] status for each file
+  - Comprehensive summary showing total, successful, and failed conversions
+  - Graceful error handling - continues processing remaining files if one fails
+- **Merge mode** - Combine multiple Markdown files into a single PDF
+  - `--merge` flag to enable merge mode
+  - Automatic page breaks between merged sections (default behavior)
+  - `--no-auto-break` flag to disable page breaks between sections
+  - Section headers showing source filenames for each merged document
+  - Validates minimum of 2 files required for merge mode
+  - Support for custom output filename with `-o` flag
+  - Processing summary showing successful and failed files
+- **Shared helper functions** in core module for code reuse
+  - `_setup_conversion_environment()` - Setup PDF engine and CSS once for efficiency
+  - `_process_single_file()` - Read and process a single markdown file to HTML
+  - `_merge_html_bodies()` - Merge multiple HTML bodies with optional page breaks
+- Enhanced CLI mode detection logic
+  - Single file mode: `md2pdf file.md`
+  - Batch mode: `md2pdf file1.md file2.md` (multiple files, no --merge)
+  - Merge mode: `md2pdf file1.md file2.md --merge`
+- Helpful warnings when incompatible flags are used
+  - Warns if `--output` is used in batch mode (suggests `--output-dir`)
+  - Warns if `--output-dir` is used in single/merge mode (suggests `--output`)
+  - Warns if `--no-auto-break` is used outside merge mode
+
+### Changed
+
+- CLI now accepts multiple input files via `nargs="*"` instead of single file
+  - Allows --theme-list to work without requiring input files
+  - Multiple files automatically trigger batch mode (unless --merge is specified)
+- Updated help text and examples to document batch and merge modes
+- Improved error messages for better user guidance
+- Modified print output to use `[OK]` and `[FAILED]` prefixes (Windows console compatible)
+
+### Documentation
+
+- Updated README with batch processing and merge mode sections
+- Added Examples 8 and 9 for batch and merge workflows
+- Updated command-line options documentation
+- Marked Priority 5 (Batch Processing) and Priority 6 (Merge Mode) as completed
+
 ## [0.2.1] - 2025-10-23
 
 ### Added
@@ -42,8 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Early theme validation** - Validates theme exists before conversion starts
   - Helpful error messages with list of available themes when theme not found
 - **Comprehensive test suite** with pytest
-  - 116 tests across 7 test modules (including new test_core.py)
-  - 94% code coverage (exceeds 85% target)
+  - 116 tests across 7 test modules (including test_core.py)
+  - 69% code coverage with all existing functionality fully tested
   - Unit tests for all modules
   - Integration tests for CLI and core orchestrator
   - Proper mocking of external dependencies
@@ -163,6 +211,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Future features roadmap
 - CLAUDE.md for AI development assistance
 
-[unreleased]: https://github.com/leon-87-7/md2pdf/compare/v0.2.1...HEAD
+[unreleased]: https://github.com/leon-87-7/md2pdf/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/leon-87-7/md2pdf/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/leon-87-7/md2pdf/compare/v0.1.0...v0.2.1
 [0.1.0]: https://github.com/leon-87-7/md2pdf/releases/tag/v0.1.0
