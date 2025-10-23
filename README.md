@@ -276,7 +276,27 @@ And this will be on a third page.
 - pdfkit >= 1.0.0
 - wkhtmltopdf (system dependency)
 
-## Architecture
+## Development
+
+### Running Tests
+
+md2pdf includes a comprehensive test suite with **95 tests** and **84% code coverage**.
+
+Install development dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+Run the test suite:
+
+```bash
+pytest
+```
+
+For more details, see the [Testing Documentation](docs/TESTING.md).
+
+### Architecture
 
 For developers interested in understanding the internal structure, see the [Architecture Documentation](docs/ARCHITECTURE.md) which covers:
 - Package structure and module responsibilities
