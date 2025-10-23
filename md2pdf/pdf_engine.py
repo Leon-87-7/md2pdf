@@ -2,13 +2,13 @@
 
 import platform
 import shutil
-import sys
 from pathlib import Path
 from typing import Optional
 
 import pdfkit
 
 from . import config
+from .exceptions import ConversionError
 
 
 def find_wkhtmltopdf() -> Optional[str]:
@@ -40,7 +40,7 @@ def find_wkhtmltopdf() -> Optional[str]:
     return None
 
 
-def create_pdf_configuration(wkhtmltopdf_path: str):
+def create_pdf_configuration(wkhtmltopdf_path: str) -> pdfkit.configuration:
     """Create pdfkit configuration object.
 
     Args:
@@ -52,20 +52,25 @@ def create_pdf_configuration(wkhtmltopdf_path: str):
     return pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
 
 
-def print_installation_help() -> None:
-    """Print platform-specific installation instructions for wkhtmltopdf."""
-    print("Error: wkhtmltopdf not found.", file=sys.stderr)
-    print(
-        "\nwkhtmltopdf is required for PDF generation but was not found on your system.",
-        file=sys.stderr,
-    )
-    print("\nInstallation instructions:", file=sys.stderr)
+def get_installation_instructions() -> str:
+    """Get platform-specific installation instructions for wkhtmltopdf.
 
+    Returns:
+        Formatted installation instructions as a string
+    """
     system = platform.system()
-    instructions = config.INSTALLATION_INSTRUCTIONS.get(system, config.INSTALLATION_INSTRUCTIONS["default"])
+    instructions = config.INSTALLATION_INSTRUCTIONS.get(
+        system, config.INSTALLATION_INSTRUCTIONS["default"]
+    )
 
-    for instruction in instructions:
-        print(instruction, file=sys.stderr)
+    lines = [
+        "wkhtmltopdf is required for PDF generation but was not found on your system.",
+        "",
+        "Installation instructions:",
+    ]
+    lines.extend(instructions)
+
+    return "\n".join(lines)
 
 
 def convert_html_to_pdf(
@@ -81,10 +86,7 @@ def convert_html_to_pdf(
         pdf_config: pdfkit configuration object
 
     Raises:
-        IOError: If PDF file cannot be written
-        OSError: If system error occurs
-        PermissionError: If insufficient permissions
-        Exception: For other pdfkit/wkhtmltopdf errors
+        ConversionError: If PDF conversion fails for any reason
     """
     try:
         pdfkit.from_string(
@@ -94,25 +96,13 @@ def convert_html_to_pdf(
             options=config.PDF_OPTIONS,
         )
     except (IOError, OSError, PermissionError) as e:
-        print(f"Error writing PDF file: {e}", file=sys.stderr)
-        print(
-            "Check that you have write permissions for the output directory.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+        error_msg = f"Error writing PDF file: {e}\n"
+        error_msg += "Check that you have write permissions for the output directory."
+        raise ConversionError(error_msg) from e
     except Exception as e:
-        print(f"Error generating PDF: {e}", file=sys.stderr)
-        print("\nTroubleshooting tips:", file=sys.stderr)
-        print(
-            "1. Try using a simpler output filename without special characters",
-            file=sys.stderr,
-        )
-        print(
-            "2. Ensure wkhtmltopdf is properly installed and accessible",
-            file=sys.stderr,
-        )
-        print(
-            "3. Try removing images or complex formatting from the markdown",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+        error_msg = f"Error generating PDF: {e}\n\n"
+        error_msg += "Troubleshooting tips:\n"
+        error_msg += "1. Try using a simpler output filename without special characters\n"
+        error_msg += "2. Ensure wkhtmltopdf is properly installed and accessible\n"
+        error_msg += "3. Try removing images or complex formatting from the markdown"
+        raise ConversionError(error_msg) from e

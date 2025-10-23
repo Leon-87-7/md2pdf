@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from md2pdf import theme_manager
+from md2pdf.exceptions import ThemeNotFoundError, CSSNotFoundError, FileOperationError
 
 
 class TestThemeManager:
@@ -67,19 +68,22 @@ class TestThemeManager:
         assert "Arial" in css
 
     def test_load_css_nonexistent_theme(self):
-        """Test loading non-existent theme raises SystemExit."""
-        with pytest.raises(SystemExit):
+        """Test loading non-existent theme raises ThemeNotFoundError."""
+        with pytest.raises(ThemeNotFoundError) as exc_info:
             theme_manager.load_css(theme="nonexistent_theme_xyz")
+        assert "nonexistent_theme_xyz" in str(exc_info.value)
 
     def test_load_css_nonexistent_file(self):
-        """Test loading non-existent custom CSS file raises SystemExit."""
-        with pytest.raises(SystemExit):
+        """Test loading non-existent custom CSS file raises CSSNotFoundError."""
+        with pytest.raises(CSSNotFoundError) as exc_info:
             theme_manager.load_css(custom_css="/path/to/nonexistent.css")
+        assert "nonexistent.css" in str(exc_info.value)
 
     def test_load_css_directory_as_file(self, temp_dir):
-        """Test that passing a directory as CSS file raises SystemExit."""
-        with pytest.raises(SystemExit):
+        """Test that passing a directory as CSS file raises CSSNotFoundError."""
+        with pytest.raises(CSSNotFoundError) as exc_info:
             theme_manager.load_css(custom_css=str(temp_dir))
+        assert "is not a file" in str(exc_info.value)
 
     def test_load_css_warns_on_non_css_extension(self, temp_dir, capsys):
         """Test warning when loading file without .css extension."""
@@ -93,6 +97,19 @@ class TestThemeManager:
         assert isinstance(css, str)
         assert "Warning" in captured.err
         assert ".css extension" in captured.err
+
+    def test_validate_theme_success(self):
+        """Test validate_theme with valid theme."""
+        # Should not raise any exception
+        theme_manager.validate_theme("default")
+        theme_manager.validate_theme("dark")
+        theme_manager.validate_theme("light")
+
+    def test_validate_theme_nonexistent(self):
+        """Test validate_theme with non-existent theme."""
+        with pytest.raises(ThemeNotFoundError) as exc_info:
+            theme_manager.validate_theme("nonexistent_theme")
+        assert "nonexistent_theme" in str(exc_info.value)
 
 
 class TestPrivateFunctions:
@@ -112,5 +129,6 @@ class TestPrivateFunctions:
 
     def test_load_theme_css_invalid_theme(self):
         """Test _load_theme_css with invalid theme."""
-        with pytest.raises(SystemExit):
+        with pytest.raises(ThemeNotFoundError) as exc_info:
             theme_manager._load_theme_css("invalid_theme")
+        assert "invalid_theme" in str(exc_info.value)

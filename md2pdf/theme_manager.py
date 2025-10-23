@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 from . import config
+from .exceptions import CSSNotFoundError, FileOperationError, ThemeNotFoundError
 
 
 def get_themes_directory() -> Path:
@@ -30,6 +31,23 @@ def list_available_themes() -> list[str]:
     return [f.stem for f in themes_dir.glob("*.css")]
 
 
+def validate_theme(theme: str) -> None:
+    """Validate that a theme exists before conversion starts.
+
+    Args:
+        theme: Theme name (without .css extension)
+
+    Raises:
+        ThemeNotFoundError: If theme is not found
+    """
+    themes_dir = get_themes_directory()
+    theme_path = themes_dir / f"{theme}.css"
+
+    if not theme_path.exists():
+        available_themes = list_available_themes()
+        raise ThemeNotFoundError(theme, available_themes)
+
+
 def load_css(custom_css: Optional[str] = None, theme: str = "default") -> str:
     """Load CSS content from custom file, theme, or default.
 
@@ -41,7 +59,9 @@ def load_css(custom_css: Optional[str] = None, theme: str = "default") -> str:
         CSS content as string
 
     Raises:
-        SystemExit: If CSS file is invalid or unreadable
+        CSSNotFoundError: If custom CSS file is not found
+        ThemeNotFoundError: If theme is not found
+        FileOperationError: If CSS file cannot be read
     """
     # --css flag takes precedence over --theme
     if custom_css:
@@ -60,18 +80,17 @@ def _load_custom_css(custom_css_path: str) -> str:
         CSS content as string
 
     Raises:
-        SystemExit: If CSS file is invalid or unreadable
+        CSSNotFoundError: If CSS file is not found
+        FileOperationError: If CSS file cannot be read
     """
     css_path = Path(custom_css_path).resolve()
 
     # Validate it's a file and exists
     if not css_path.exists():
-        print(f"Error: CSS file '{custom_css_path}' does not exist.", file=sys.stderr)
-        sys.exit(1)
+        raise CSSNotFoundError(f"CSS file '{custom_css_path}' does not exist.")
 
     if not css_path.is_file():
-        print(f"Error: CSS file '{custom_css_path}' is not a file.", file=sys.stderr)
-        sys.exit(1)
+        raise CSSNotFoundError(f"CSS file '{custom_css_path}' is not a file.")
 
     # Warn if extension is not .css
     if css_path.suffix.lower() != ".css":
@@ -84,8 +103,7 @@ def _load_custom_css(custom_css_path: str) -> str:
         with open(css_path, "r", encoding="utf-8") as f:
             return f.read()
     except (IOError, PermissionError, UnicodeDecodeError) as e:
-        print(f"Error reading CSS file: {e}", file=sys.stderr)
-        sys.exit(1)
+        raise FileOperationError(f"Error reading CSS file: {e}") from e
 
 
 def _load_theme_css(theme: str) -> str:
@@ -98,25 +116,18 @@ def _load_theme_css(theme: str) -> str:
         CSS content as string
 
     Raises:
-        SystemExit: If theme is not found or unreadable
+        ThemeNotFoundError: If theme is not found
+        FileOperationError: If theme file cannot be read
     """
     themes_dir = get_themes_directory()
     theme_path = themes_dir / f"{theme}.css"
 
     if not theme_path.exists():
         available_themes = list_available_themes()
-        print(f"Error: Theme '{theme}' not found.", file=sys.stderr)
-        if available_themes:
-            print(
-                f"Available themes: {', '.join(available_themes)}", file=sys.stderr
-            )
-        else:
-            print("No themes found in themes directory.", file=sys.stderr)
-        sys.exit(1)
+        raise ThemeNotFoundError(theme, available_themes)
 
     try:
         with open(theme_path, "r", encoding="utf-8") as f:
             return f.read()
     except (IOError, PermissionError, UnicodeDecodeError) as e:
-        print(f"Error reading theme file: {e}", file=sys.stderr)
-        sys.exit(1)
+        raise FileOperationError(f"Error reading theme file: {e}") from e

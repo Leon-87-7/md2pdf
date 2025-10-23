@@ -6,6 +6,7 @@ from unittest.mock import patch, MagicMock, call
 import pytest
 
 from md2pdf import pdf_engine
+from md2pdf.exceptions import ConversionError
 
 
 class TestFindWkhtmltopdf:
@@ -82,55 +83,51 @@ class TestCreatePdfConfiguration:
         mock_pdfkit_config.assert_called_once_with(wkhtmltopdf=test_path)
 
 
-class TestPrintInstallationHelp:
-    """Test installation help printing."""
+class TestGetInstallationInstructions:
+    """Test installation instructions generation."""
 
     @patch("platform.system")
-    def test_print_installation_help_linux(self, mock_system, capsys):
-        """Test printing installation help for Linux."""
+    def test_get_installation_instructions_linux(self, mock_system):
+        """Test getting installation instructions for Linux."""
         mock_system.return_value = "Linux"
 
-        pdf_engine.print_installation_help()
-        captured = capsys.readouterr()
+        instructions = pdf_engine.get_installation_instructions()
 
-        assert "Error: wkhtmltopdf not found" in captured.err
-        assert "Installation instructions" in captured.err
-        assert "apt-get" in captured.err or "dnf" in captured.err
+        assert "wkhtmltopdf is required" in instructions
+        assert "Installation instructions" in instructions
+        assert "apt-get" in instructions or "dnf" in instructions
 
     @patch("platform.system")
-    def test_print_installation_help_windows(self, mock_system, capsys):
-        """Test printing installation help for Windows."""
+    def test_get_installation_instructions_windows(self, mock_system):
+        """Test getting installation instructions for Windows."""
         mock_system.return_value = "Windows"
 
-        pdf_engine.print_installation_help()
-        captured = capsys.readouterr()
+        instructions = pdf_engine.get_installation_instructions()
 
-        assert "Error: wkhtmltopdf not found" in captured.err
-        assert "Installation instructions" in captured.err
-        assert "Download from" in captured.err
+        assert "wkhtmltopdf is required" in instructions
+        assert "Installation instructions" in instructions
+        assert "Download from" in instructions
 
     @patch("platform.system")
-    def test_print_installation_help_macos(self, mock_system, capsys):
-        """Test printing installation help for macOS."""
+    def test_get_installation_instructions_macos(self, mock_system):
+        """Test getting installation instructions for macOS."""
         mock_system.return_value = "Darwin"
 
-        pdf_engine.print_installation_help()
-        captured = capsys.readouterr()
+        instructions = pdf_engine.get_installation_instructions()
 
-        assert "Error: wkhtmltopdf not found" in captured.err
-        assert "Installation instructions" in captured.err
-        assert "brew" in captured.err or "Homebrew" in captured.err
+        assert "wkhtmltopdf is required" in instructions
+        assert "Installation instructions" in instructions
+        assert "brew" in instructions or "Homebrew" in instructions
 
     @patch("platform.system")
-    def test_print_installation_help_unknown_platform(self, mock_system, capsys):
-        """Test printing installation help for unknown platform."""
+    def test_get_installation_instructions_unknown_platform(self, mock_system):
+        """Test getting installation instructions for unknown platform."""
         mock_system.return_value = "UnknownOS"
 
-        pdf_engine.print_installation_help()
-        captured = capsys.readouterr()
+        instructions = pdf_engine.get_installation_instructions()
 
-        assert "Error: wkhtmltopdf not found" in captured.err
-        assert "Installation instructions" in captured.err
+        assert "wkhtmltopdf is required" in instructions
+        assert "Installation instructions" in instructions
         # Should fall back to default instructions
 
 
@@ -160,38 +157,39 @@ class TestConvertHtmlToPdf:
         output_path = temp_dir / "output.pdf"
         config = MagicMock()
 
-        with pytest.raises(SystemExit):
+        with pytest.raises(ConversionError) as exc_info:
             pdf_engine.convert_html_to_pdf(html, output_path, config)
 
+        assert "Error writing PDF file" in str(exc_info.value)
+        assert "write permissions" in str(exc_info.value)
+
     @patch("pdfkit.from_string")
-    def test_convert_html_to_pdf_permission_error(self, mock_from_string, temp_dir, capsys):
+    def test_convert_html_to_pdf_permission_error(self, mock_from_string, temp_dir):
         """Test handling of PermissionError during conversion."""
         mock_from_string.side_effect = PermissionError("Access denied")
         html = "<html><body><h1>Test</h1></body></html>"
         output_path = temp_dir / "output.pdf"
         config = MagicMock()
 
-        with pytest.raises(SystemExit):
+        with pytest.raises(ConversionError) as exc_info:
             pdf_engine.convert_html_to_pdf(html, output_path, config)
 
-        captured = capsys.readouterr()
-        assert "Error writing PDF file" in captured.err
-        assert "write permissions" in captured.err
+        assert "Error writing PDF file" in str(exc_info.value)
+        assert "write permissions" in str(exc_info.value)
 
     @patch("pdfkit.from_string")
-    def test_convert_html_to_pdf_general_error(self, mock_from_string, temp_dir, capsys):
+    def test_convert_html_to_pdf_general_error(self, mock_from_string, temp_dir):
         """Test handling of general errors during conversion."""
         mock_from_string.side_effect = Exception("Unknown error")
         html = "<html><body><h1>Test</h1></body></html>"
         output_path = temp_dir / "output.pdf"
         config = MagicMock()
 
-        with pytest.raises(SystemExit):
+        with pytest.raises(ConversionError) as exc_info:
             pdf_engine.convert_html_to_pdf(html, output_path, config)
 
-        captured = capsys.readouterr()
-        assert "Error generating PDF" in captured.err
-        assert "Troubleshooting tips" in captured.err
+        assert "Error generating PDF" in str(exc_info.value)
+        assert "Troubleshooting tips" in str(exc_info.value)
 
     @patch("pdfkit.from_string")
     def test_convert_html_to_pdf_uses_config_options(self, mock_from_string, temp_dir):

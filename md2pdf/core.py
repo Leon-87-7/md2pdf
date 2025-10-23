@@ -4,6 +4,7 @@ import sys
 from typing import Optional
 
 from . import file_operations, markdown_processor, pdf_engine, theme_manager
+from .exceptions import WkhtmltopdfNotFoundError
 
 
 def convert_md_to_pdf(
@@ -26,7 +27,12 @@ def convert_md_to_pdf(
         preview: Whether to open the PDF after generation (default: False)
 
     Raises:
-        SystemExit: If conversion fails or dependencies are missing
+        WkhtmltopdfNotFoundError: If wkhtmltopdf is not found on the system
+        ConversionError: If PDF conversion fails
+        ThemeNotFoundError: If the requested theme is not found
+        CSSNotFoundError: If the custom CSS file is not found
+        InvalidInputError: If input file validation fails
+        FileOperationError: If file read/write operations fail
     """
     # 1. Setup: Warn if both custom_css and theme are specified
     if custom_css and theme != "default":
@@ -35,11 +41,15 @@ def convert_md_to_pdf(
             file=sys.stderr,
         )
 
+    # Validate theme early if not using custom CSS
+    if not custom_css:
+        theme_manager.validate_theme(theme)
+
     # 2. PDF Engine: Find and configure wkhtmltopdf
     engine_path = pdf_engine.find_wkhtmltopdf()
     if engine_path is None:
-        pdf_engine.print_installation_help()
-        sys.exit(1)
+        instructions = pdf_engine.get_installation_instructions()
+        raise WkhtmltopdfNotFoundError(instructions)
 
     pdf_config = pdf_engine.create_pdf_configuration(engine_path)
 

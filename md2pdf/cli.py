@@ -1,9 +1,11 @@
 """Command-line interface for md2pdf."""
 
 import argparse
+import sys
 
 from . import config
 from .core import convert_md_to_pdf
+from .exceptions import Md2PdfError
 from .theme_manager import list_available_themes
 
 
@@ -80,7 +82,11 @@ Example usage:
     if not args.input:
         parser.error("the following arguments are required: input")
 
-    convert_md_to_pdf(args.input, args.output, args.css, args.theme, args.preview)
+    try:
+        convert_md_to_pdf(args.input, args.output, args.css, args.theme, args.preview)
+    except Md2PdfError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

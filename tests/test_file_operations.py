@@ -6,6 +6,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 from md2pdf import file_operations
+from md2pdf.exceptions import InvalidInputError, FileOperationError
 
 
 class TestValidateInputFile:
@@ -18,14 +19,16 @@ class TestValidateInputFile:
         assert result == sample_markdown_file
 
     def test_validate_input_file_nonexistent(self):
-        """Test validating a non-existent file raises SystemExit."""
-        with pytest.raises(SystemExit):
+        """Test validating a non-existent file raises InvalidInputError."""
+        with pytest.raises(InvalidInputError) as exc_info:
             file_operations.validate_input_file("nonexistent_file.md")
+        assert "does not exist" in str(exc_info.value)
 
     def test_validate_input_file_directory(self, temp_dir):
-        """Test validating a directory raises SystemExit."""
-        with pytest.raises(SystemExit):
+        """Test validating a directory raises InvalidInputError."""
+        with pytest.raises(InvalidInputError) as exc_info:
             file_operations.validate_input_file(str(temp_dir))
+        assert "is not a file" in str(exc_info.value)
 
     def test_validate_input_file_warns_on_invalid_extension(self, temp_dir, capsys):
         """Test warning on non-markdown extension."""

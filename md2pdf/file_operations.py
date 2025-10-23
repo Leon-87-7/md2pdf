@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Optional
 
 from . import config
+from .exceptions import FileOperationError, InvalidInputError
 
 
 def validate_input_file(input_file: str) -> Path:
@@ -20,17 +21,15 @@ def validate_input_file(input_file: str) -> Path:
         Validated Path object
 
     Raises:
-        SystemExit: If validation fails
+        InvalidInputError: If validation fails
     """
     input_path = Path(input_file)
 
     if not input_path.exists():
-        print(f"Error: Input file '{input_file}' does not exist.", file=sys.stderr)
-        sys.exit(1)
+        raise InvalidInputError(f"Input file '{input_file}' does not exist.")
 
     if not input_path.is_file():
-        print(f"Error: '{input_file}' is not a file.", file=sys.stderr)
-        sys.exit(1)
+        raise InvalidInputError(f"'{input_file}' is not a file.")
 
     # Optional: Validate extension (warn, don't error)
     if input_path.suffix.lower() not in config.SUPPORTED_MARKDOWN_EXTENSIONS:
@@ -41,8 +40,7 @@ def validate_input_file(input_file: str) -> Path:
 
     # Check readability
     if not os.access(input_path, os.R_OK):
-        print(f"Error: No read permission for '{input_file}'.", file=sys.stderr)
-        sys.exit(1)
+        raise InvalidInputError(f"No read permission for '{input_file}'.")
 
     return input_path
 
@@ -57,14 +55,13 @@ def read_markdown_file(path: Path) -> str:
         File content as string
 
     Raises:
-        SystemExit: If file cannot be read
+        FileOperationError: If file cannot be read
     """
     try:
         with open(path, "r", encoding="utf-8") as f:
             return f.read()
     except (IOError, PermissionError, UnicodeDecodeError) as e:
-        print(f"Error reading input file: {e}", file=sys.stderr)
-        sys.exit(1)
+        raise FileOperationError(f"Error reading input file: {e}") from e
 
 
 def determine_output_path(input_path: Path, output_arg: Optional[str]) -> Path:
