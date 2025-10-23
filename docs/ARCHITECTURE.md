@@ -35,6 +35,8 @@ md2pdf/
 
 ---
 
+<!-- pagebreak -->
+
 ## Module Responsibilities
 
 ### 1. `config.py` - Configuration & Constants
@@ -61,6 +63,8 @@ from . import config
 extensions = config.MARKDOWN_EXTENSIONS
 options = config.PDF_OPTIONS
 ```
+
+<!-- pagebreak -->
 
 ---
 
@@ -89,6 +93,8 @@ config = pdf_engine.create_pdf_configuration(path)
 pdf_engine.convert_html_to_pdf(html, output_path, config)
 ```
 
+<!-- pagebreak -->
+
 ---
 
 ### 3. `markdown_processor.py` - Markdown Processing
@@ -113,6 +119,8 @@ html_body = markdown_processor.markdown_to_html(md_content)
 html_body = markdown_processor.process_page_breaks(html_body)
 full_html = markdown_processor.build_html_document(title, html_body, css)
 ```
+
+<!-- pagebreak -->
 
 ---
 
@@ -140,6 +148,8 @@ themes = theme_manager.list_available_themes()
 css = theme_manager.load_css(custom_css=None, theme="dark")
 ```
 
+<!-- pagebreak -->
+
 ---
 
 ### 5. `file_operations.py` - File I/O Operations
@@ -166,6 +176,8 @@ content = file_operations.read_markdown_file(input_path)
 output_path = file_operations.determine_output_path(input_path, None)
 file_operations.preview_file(output_path)
 ```
+
+<!-- pagebreak -->
 
 ---
 
@@ -221,6 +233,8 @@ def convert_md_to_pdf(input_file, output_file, custom_css, theme, preview):
         file_operations.preview_file(output_path)
 ```
 
+<!-- pagebreak -->
+
 ---
 
 ### 7. `cli.py` - Command-Line Interface
@@ -253,6 +267,8 @@ def main():
     convert_md_to_pdf(args.input, args.output, args.css, args.theme, args.preview)
 ```
 
+<!-- pagebreak -->
+
 ---
 
 ### 8. `__init__.py` - Package Interface
@@ -279,6 +295,8 @@ __all__ = [
 - ✅ Hide internal implementation details
 - ✅ Users import from package root: `from md2pdf import convert_md_to_pdf`
 
+<!-- pagebreak -->
+
 ---
 
 ### 9. `__main__.py` - Module Entry Point
@@ -303,6 +321,8 @@ python -m md2pdf document.md --theme dark
 **Benefits**:
 - ✅ Standard Python package pattern
 - ✅ Works without installation (`python -m md2pdf`)
+
+<!-- pagebreak -->
 
 ---
 
@@ -329,6 +349,8 @@ python -m md2pdf document.md --theme dark
 └────┘ └────────┘ └───────────┘ └───────────┘└─────────────┘
  wkhtml  MD→HTML    CSS Load    I/O & Valid   Constants
 ```
+
+<!-- pagebreak -->
 
 ---
 
@@ -362,6 +384,8 @@ md2pdf.convert_md_to_pdf("input.md", custom_css="custom.css")
 themes = md2pdf.list_available_themes()
 print(f"Available themes: {', '.join(themes)}")
 ```
+
+<!-- pagebreak -->
 
 ---
 
@@ -400,6 +424,8 @@ Configuration centralized in `config.py`:
 - Markdown extensions defined once
 - PDF options defined once
 
+<!-- pagebreak -->
+
 ---
 
 ## Benefits of This Architecture
@@ -420,6 +446,8 @@ Configuration centralized in `config.py`:
 ✅ **Reusable** - Can import and use programmatically
 ✅ **Documented** - Clear module boundaries and responsibilities
 
+<!-- pagebreak -->
+
 ---
 
 ## Module Metrics
@@ -438,6 +466,8 @@ Configuration centralized in `config.py`:
 
 **Total**: ~620 lines (vs 428 in single file)
 **Overhead**: ~45% more lines, but **much** better organized
+
+<!-- pagebreak -->
 
 ---
 
@@ -486,6 +516,8 @@ def test_full_conversion(tmp_path):
 
     assert output_file.exists()
 ```
+
+<!-- pagebreak -->
 
 ---
 
@@ -538,6 +570,8 @@ class Plugin:
         return html
 ```
 
+<!-- pagebreak -->
+
 ---
 
 ## Migration from Legacy
@@ -555,6 +589,8 @@ The old single-file version (`md2pdf_old.py`) is kept as a backup. To migrate:
    ```
 
 3. **Installation**: Run `pip install -e .` in project root
+
+<!-- pagebreak -->
 
 ---
 
