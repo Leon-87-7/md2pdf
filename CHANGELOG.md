@@ -137,5 +137,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Future features roadmap
 - CLAUDE.md for AI development assistance
 
-[unreleased]: https://github.com/yourusername/md2pdf/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/md2pdf/releases/tag/v0.1.0
+[unreleased]: https://github.com/leon-87-7/md2pdf/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/leon-87-7/md2pdf/releases/tag/v0.1.0
