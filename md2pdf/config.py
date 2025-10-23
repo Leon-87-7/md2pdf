@@ -3,7 +3,7 @@
 from pathlib import Path
 
 # Version
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 # Paths
 THEMES_DIR_NAME = "themes"
@@ -17,6 +17,13 @@ PDF_OPTIONS = {
     "enable-local-file-access": None,
     "encoding": "UTF-8",
     "quiet": "",
+    "page-size": "A4",
+    "margin-top": "0mm",
+    "margin-right": "0mm",
+    "margin-bottom": "0mm",
+    "margin-left": "0mm",
+    # "disable-smart-shrinking": "",
+    "background": "",
 }
 
 # Supported markdown file extensions
