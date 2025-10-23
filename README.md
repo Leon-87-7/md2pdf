@@ -6,12 +6,19 @@
 ## Features
 
 - Convert Markdown to PDF with a single command
-- Beautiful default gradient styling with professional typography
+- **5 pre-built themes** (default, dark, light, minimal, professional)
+- **Theme discovery** with `--theme-list` flag to list all available themes
+- Beautiful default styling with professional typography
 - Support for custom CSS styling
 - Handles tables, code blocks, lists, and images
 - Syntax highlighting for code blocks
 - Table of contents generation
 - Responsive page layout (A4 size with proper margins)
+- Explicit page break support
+- **Preview mode** (`-p`) to auto-open PDFs after generation
+- **Auto-detection** of wkhtmltopdf across all platforms
+- **Modular architecture** with clean separation of concerns
+- **Comprehensive test suite** with 95 tests and 84% code coverage
 
 ## Prerequisites
 
@@ -75,13 +82,33 @@ This creates `document.pdf` in the same directory.
 md2pdf input.md -o output.pdf
 ```
 
+### Theme Selection
+
+List all available themes:
+
+```bash
+md2pdf --theme-list
+```
+
+Choose from pre-built themes:
+
+```bash
+md2pdf document.md --theme default       # Default gradient theme
+md2pdf document.md --theme dark          # Dark mode theme
+md2pdf document.md --theme light         # Light theme
+md2pdf document.md --theme minimal       # Minimal clean theme
+md2pdf document.md --theme professional  # Professional business theme
+```
+
 ### Custom CSS Styling
 
-Use your own CSS file for custom styling:
+Use your own CSS file for custom styling (takes precedence over themes):
 
 ```bash
 md2pdf notes.md --css custom-style.css
 ```
+
+**Note:** If both `--theme` and `--css` are specified, the custom CSS file takes precedence and a warning will be displayed.
 
 ### Preview Mode
 
@@ -96,7 +123,7 @@ This will generate the PDF and immediately open it in your system's default PDF 
 ### Command Line Options
 
 ```
-usage: md2pdf [-h] [-o OUTPUT] [--css CSS] [-p] [-v] input
+usage: md2pdf [-h] [-o OUTPUT] [--theme THEME] [--theme-list] [--css CSS] [-p] [-v] [input]
 
 positional arguments:
   input                 Path to the input Markdown file
@@ -105,7 +132,11 @@ optional arguments:
   -h, --help            show this help message and exit
   -o OUTPUT, --output OUTPUT
                         Output PDF file (default: same name as input)
+  --theme THEME         Theme to use for styling (default: default)
+                        Ignored if --css is specified
+  --theme-list, -thl    List all available themes and exit
   --css CSS             Path to a custom CSS file for styling the PDF
+                        Takes precedence over --theme
   -p, --preview         Open the PDF with the default viewer after conversion
   -v, --version         show program's version number and exit
 ```
@@ -124,23 +155,68 @@ md2pdf README.md
 md2pdf docs/guide.md -o pdfs/user-guide.pdf
 ```
 
-### Example 3: Custom Styling
+### Example 3: Listing Available Themes
+
+```bash
+md2pdf --theme-list
+```
+
+### Example 4: Using Themes
+
+```bash
+md2pdf report.md --theme dark
+md2pdf notes.md --theme minimal
+md2pdf business.md --theme professional
+```
+
+### Example 5: Custom Styling
 
 ```bash
 md2pdf report.md --css styles/corporate.css
 ```
 
-### Example 4: Preview Mode
+### Example 6: Preview Mode
 
 ```bash
 md2pdf document.md -p
 ```
 
-## Default Styling
+### Example 7: Theme with Preview
 
-The default CSS includes:
+```bash
+md2pdf presentation.md --theme dark -p
+```
 
-- Gradient backgrounds with modern color schemes
+## Themes
+
+md2pdf supports multiple pre-built themes located in the `themes/` directory. Each theme is a CSS file that can be selected using the `--theme` flag.
+
+### Discovering Themes
+
+List all available themes:
+
+```bash
+md2pdf --theme-list
+```
+
+Output:
+
+```
+Available themes:
+  - dark
+  - default
+  - light
+  - minimal
+  - professional
+
+Usage: md2pdf document.md --theme <theme-name>
+```
+
+### Available Themes
+
+**default** - Gradient theme with modern styling
+
+- Gradient backgrounds (purple/blue color scheme)
 - Professional typography (Segoe UI font family)
 - Styled headings with gradient backgrounds
 - Code blocks with syntax highlighting
@@ -148,9 +224,55 @@ The default CSS includes:
 - Styled blockquotes and links
 - Image borders and shadows
 
+**dark** - Dark mode theme
+
+- Dark background (#1a1a1a) with light text
+- Optimized for reduced eye strain
+- Subtle styling for code blocks and tables
+- Semi-transparent content boxes
+
+**light** - Clean light theme
+
+- White background with dark text
+- Minimal styling for maximum readability
+- Professional appearance for business documents
+
+**minimal** - Ultra-minimal styling
+
+- Black and white design
+- No backgrounds or decorations
+- Maximum readability
+- Perfect for printing
+
+**professional** - Business-oriented theme
+
+- Clean, corporate styling
+- Traditional typography
+- Suitable for formal reports and documentation
+
+### Theme Directory Structure
+
+Themes are stored in the `themes/` directory:
+
+```
+md2pdf/
+├── md2pdf/
+│   ├── cli.py
+│   ├── core.py
+│   └── ...
+├── themes/
+│   ├── default.css
+│   ├── dark.css
+│   ├── light.css
+│   ├── minimal.css
+│   └── professional.css
+```
+
 ## Custom CSS
 
-To create a custom CSS file, you can start with the default styling and modify it. The CSS should include styles for:
+You can create your own CSS file for complete control over styling. The CSS file takes precedence over any theme.
+
+To create a custom CSS file, you can start with one of the existing themes from the `themes/` directory and modify it. The CSS should include styles for:
 
 - Page layout (`@page`)
 - Body content
@@ -162,6 +284,7 @@ To create a custom CSS file, you can start with the default styling and modify i
 - Blockquotes
 - Links
 - Images
+- Page breaks (`.page-break` class)
 
 ## Supported Markdown Features
 
@@ -215,10 +338,44 @@ And this will be on a third page.
 
 ## Requirements
 
-- Python 3.6+
+- Python 3.9+
 - markdown >= 3.4
 - pdfkit >= 1.0.0
 - wkhtmltopdf (system dependency)
+
+### Development Requirements
+
+- pytest >= 7.4.0
+- pytest-cov >= 4.1.0
+- pytest-mock >= 3.11.0
+
+## Development
+
+### Running Tests
+
+md2pdf includes a comprehensive test suite with **95 tests** and **84% code coverage**.
+
+Install development dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+Run the test suite:
+
+```bash
+pytest
+```
+
+For more details, see the [Testing Documentation](docs/TESTING.md).
+
+### Architecture
+
+For developers interested in understanding the internal structure, see the [Architecture Documentation](docs/ARCHITECTURE.md) which covers:
+
+- Package structure and module responsibilities
+- Data flow and design principles
+- Testing strategy and future extensions
 
 ## Troubleshooting
 
@@ -247,6 +404,14 @@ Make sure you have write permissions in the output directory.
 
 Avoid using emojis or non-UTF-8 characters in output filenames, as they may cause issues with wkhtmltopdf.
 
+### Theme not found error
+
+If you get an error about a theme not being found:
+
+1. Ensure the `themes/` directory exists in the same location as `md2pdf.py`
+2. Check that the theme file exists (e.g., `themes/default.css`)
+3. The tool will list available themes if the requested theme is not found
+
 ## Future features
 
 ### Priority Order:
@@ -264,9 +429,11 @@ Avoid using emojis or non-UTF-8 characters in output filenames, as they may caus
   Supports multiple formats: <!-- pagebreak -->, <!-- page-break -->, case-insensitive
   Uses CSS page-break-after to create new pages in PDF
 
-- Multiple CSS Themes via --theme (Priority 4) ⏳ NEXT
-  Pre-built themes: gradient (current), minimal, corporate, academic, dark
-  Select with --theme flag
+- Multiple CSS Themes via --theme (Priority 4) ✅ COMPLETED
+  Theme system with --theme flag
+  Themes stored in external CSS files in themes/ directory
+  Custom CSS takes precedence over themes
+  Type hints and improved error handling throughout codebase
 
 - Batch Processing (Priority 5)
   Convert multiple files to separate PDFs
@@ -278,7 +445,7 @@ Avoid using emojis or non-UTF-8 characters in output filenames, as they may caus
 
 ## License
 
-This project is open source and available for use and modification.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 

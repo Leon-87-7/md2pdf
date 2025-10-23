@@ -11,3 +11,6 @@ wheels/
 
 # Generated PDFs
 *.pdf
+# Test coverage reports
+.coverage
+htmlcov/
