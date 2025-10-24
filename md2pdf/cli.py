@@ -34,7 +34,7 @@ def main() -> None:
 Example usage:
   # Single file conversion
   md2pdf document.md                                   # Use default theme
-  md2pdf input.md -o output.pdf                        # Specify output file name
+  md2pdf input.md -on output.pdf                       # Specify output file name
   md2pdf report.md --css custom-style.css              # Use custom CSS file
   md2pdf report.md --theme dark -p                     # Use dark theme and preview
 
@@ -43,7 +43,7 @@ Example usage:
   md2pdf *.md --output-dir pdfs                        # Convert all .md files to pdfs/ directory
 
   # Merge mode (combine multiple files into one PDF)
-  md2pdf file1.md file2.md --merge -o combined.pdf     # Merge files into one PDF
+  md2pdf file1.md file2.md --merge -on combined.pdf    # Merge files into one PDF
   md2pdf *.md --merge --no-auto-break                  # Merge without page breaks
 
   # Theme management
@@ -56,47 +56,47 @@ Example usage:
         help="Path to input Markdown file(s). Multiple files triggers batch mode.",
     )
     parser.add_argument(
-        "-o",
-        "--output",
-        help="Output PDF file name (single file mode only, default: same name as input)",
+        "-on",
+        "--output-name",
+        help="Output PDF file name (default: same name as input)",
     )
     parser.add_argument(
-        "--output-dir",
         "-od",
+        "--output-dir",
         help="Output directory for batch mode (default: same directory as each input file)",
     )
     parser.add_argument(
-        "--theme",
         "-th",
+        "--theme",
         default="default",
         help="Theme to use for styling (default: default). Ignored if --css is specified.",
     )
     parser.add_argument(
-        "--theme-list",
         "-thl",
+        "--theme-list",
         action="store_true",
         help="List all available themes and exit",
     )
     parser.add_argument(
-        "--css",
         "-c",
+        "--css",
         help="Path to a custom CSS file for styling the PDF. Takes precedence over --theme.",
     )
     parser.add_argument(
-        "--preview",
         "-p",
+        "--preview",
         action="store_true",
         help="Open the PDF with the default viewer after conversion",
     )
     parser.add_argument(
-        "--merge",
         "-m",
+        "--merge",
         action="store_true",
         help="Merge multiple input files into a single PDF (requires 2+ files)",
     )
     parser.add_argument(
-        "--no-auto-break",
         "-nab",
+        "--no-auto-break",
         action="store_true",
         help="Disable automatic page breaks between merged documents (merge mode only)",
     )
@@ -132,7 +132,12 @@ Example usage:
                 )
             auto_break = not args.no_auto_break
             convert_merge(
-                args.input, args.output, args.css, args.theme, auto_break, args.preview
+                args.input,
+                args.output_name,
+                args.css,
+                args.theme,
+                auto_break,
+                args.preview,
             )
         elif len(args.input) > 1:
             # Batch mode: convert multiple files to separate PDFs
