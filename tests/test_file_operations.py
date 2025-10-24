@@ -247,3 +247,163 @@ class TestPreviewFile:
 
         assert "Warning" in captured.err
         assert "Timeout" in captured.err
+
+
+class TestDetermineOutputPathSecurity:
+    """Security tests for output path validation."""
+
+    def test_path_traversal_attack_simple(self, temp_dir):
+        """Test that simple path traversal attacks are blocked."""
+        input_path = temp_dir / "input.md"
+
+        with pytest.raises(InvalidInputError) as exc_info:
+            file_operations.determine_output_path(input_path, "../../etc/passwd.pdf")
+
+        assert "path traversal" in str(exc_info.value).lower()
+
+    def test_path_traversal_attack_complex(self, temp_dir):
+        """Test that complex path traversal attacks are blocked."""
+        input_path = temp_dir / "input.md"
+
+        with pytest.raises(InvalidInputError) as exc_info:
+            file_operations.determine_output_path(input_path, "../../../secret.pdf")
+
+        assert "path traversal" in str(exc_info.value).lower()
+
+    def test_path_traversal_mixed_with_safe_path(self, temp_dir):
+        """Test that traversal mixed with safe paths is blocked."""
+        input_path = temp_dir / "input.md"
+
+        with pytest.raises(InvalidInputError) as exc_info:
+            file_operations.determine_output_path(input_path, "safe/../../../etc/passwd.pdf")
+
+        assert "path traversal" in str(exc_info.value).lower()
+
+    def test_relative_path_escaping_cwd(self, temp_dir):
+        """Test that relative paths escaping CWD are blocked."""
+        import os
+        input_path = temp_dir / "input.md"
+
+        # Create a relative path that would escape CWD after resolution
+        # This test ensures the function checks the resolved path against CWD
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(temp_dir)
+
+            # Try to write to parent of temp_dir using a relative path
+            parent_path = "../outside.pdf"
+
+            with pytest.raises(InvalidInputError) as exc_info:
+                file_operations.determine_output_path(input_path, parent_path)
+
+            # Should be caught as path traversal or outside current directory
+            error_msg = str(exc_info.value).lower()
+            assert "path traversal" in error_msg or "outside current directory" in error_msg
+        finally:
+            os.chdir(original_cwd)
+
+    def test_absolute_path_allowed(self, temp_dir):
+        """Test that absolute paths are allowed and work correctly."""
+        input_path = temp_dir / "input.md"
+        output_arg = str(temp_dir / "output.pdf")
+
+        result = file_operations.determine_output_path(input_path, output_arg)
+
+        assert result.is_absolute()
+        assert result.name == "output.pdf"
+
+    def test_safe_relative_path_within_cwd(self, temp_dir):
+        """Test that safe relative paths within CWD are allowed."""
+        input_path = temp_dir / "input.md"
+
+        import os
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(temp_dir)
+
+            # Create subdirectory
+            subdir = temp_dir / "subdir"
+            subdir.mkdir()
+
+            # This should be allowed
+            result = file_operations.determine_output_path(input_path, "subdir/output.pdf")
+
+            assert result.is_absolute()
+            assert "subdir" in str(result)
+            assert result.name == "output.pdf"
+        finally:
+            os.chdir(original_cwd)
+
+    def test_symlink_detection_and_validation(self, temp_dir):
+        """Test that symlinks are detected and validated."""
+        import os
+
+        if not hasattr(os, 'symlink'):
+            pytest.skip("Symlinks not supported on this platform")
+
+        input_path = temp_dir / "input.md"
+
+        # Create a safe symlink within temp_dir
+        target_dir = temp_dir / "target"
+        target_dir.mkdir()
+        symlink_dir = temp_dir / "link"
+
+        try:
+            symlink_dir.symlink_to(target_dir)
+
+            # This should work - symlink points within CWD
+            original_cwd = os.getcwd()
+            try:
+                os.chdir(temp_dir)
+                result = file_operations.determine_output_path(
+                    input_path, "link/output.pdf"
+                )
+                assert result.is_absolute()
+            finally:
+                os.chdir(original_cwd)
+        except OSError:
+            pytest.skip("Cannot create symlinks (may need elevated permissions on Windows)")
+
+    def test_normalized_path_returned(self, temp_dir):
+        """Test that returned paths are properly normalized."""
+        input_path = temp_dir / "input.md"
+        output_arg = str(temp_dir / "dir1" / "." / "output.pdf")
+
+        result = file_operations.determine_output_path(input_path, output_arg)
+
+        # Should be normalized (no . components)
+        assert "." not in result.parts[-2:]  # Check last two parts
+        assert result.name == "output.pdf"
+
+    def test_invalid_path_characters_handled(self, temp_dir):
+        """Test handling of paths with invalid characters."""
+        input_path = temp_dir / "input.md"
+
+        # On Windows, certain characters are invalid
+        # On Unix, most characters are valid
+        # Just ensure no crash occurs
+        import platform
+        if platform.system() == "Windows":
+            invalid_chars = ['<', '>', ':', '"', '|', '?', '*']
+            for char in invalid_chars:
+                try:
+                    result = file_operations.determine_output_path(
+                        input_path, f"test{char}file.pdf"
+                    )
+                    # If it doesn't raise, that's fine too (path validation may occur later)
+                except (InvalidInputError, OSError, ValueError):
+                    # Expected - invalid character caught
+                    pass
+
+    def test_error_messages_are_informative(self, temp_dir):
+        """Test that error messages provide helpful information."""
+        input_path = temp_dir / "input.md"
+
+        with pytest.raises(InvalidInputError) as exc_info:
+            file_operations.determine_output_path(input_path, "../../attack.pdf")
+
+        error_msg = str(exc_info.value)
+        # Should mention what's wrong
+        assert "path traversal" in error_msg.lower()
+        # Should mention what was attempted
+        assert "attack.pdf" in error_msg or ".." in error_msg
