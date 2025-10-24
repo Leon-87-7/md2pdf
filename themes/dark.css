@@ -42,7 +42,7 @@ h1 {
     font-weight: 700;
 }
 
-#document-section-header {
+.document-section-header {
     font-size: 28pt;
     color: #ffffff90;
     padding: 20px;
@@ -201,14 +201,4 @@ img {
     margin: 2cm 0;
     padding: 0;
     border: none;
-}
-
-h1 #document-section-header {
-    font-size: 32pt;
-    color: #fff;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: 700;
 }

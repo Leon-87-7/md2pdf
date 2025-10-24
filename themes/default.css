@@ -33,7 +33,7 @@ h1 {
     font-weight: 700;
 }
 
-#document-section-header {
+.document-section-header {
     font-size: 28pt;
     color: #2c3e50af;
     padding: 20px;

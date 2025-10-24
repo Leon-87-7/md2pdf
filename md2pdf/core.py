@@ -1,11 +1,12 @@
 """Core conversion orchestrator for md2pdf."""
 
+import html
 import sys
 from pathlib import Path
 from typing import Optional
 
 from . import file_operations, markdown_processor, pdf_engine, theme_manager
-from .exceptions import WkhtmltopdfNotFoundError
+from .exceptions import Md2PdfError, WkhtmltopdfNotFoundError
 
 
 def _setup_conversion_environment(
@@ -62,12 +63,17 @@ def _merge_html_bodies(html_bodies: list[tuple[str, str]], auto_break: bool = Tr
 
     Returns:
         Merged HTML body string
+
+    Note:
+        Filenames are HTML-escaped to prevent injection attacks.
     """
     merged_parts = []
 
     for i, (filename, html_body) in enumerate(html_bodies):
+        # Escape filename to prevent HTML injection
+        safe_filename = html.escape(filename)
         # Add a section header with the filename
-        section_header = f'<h1 class="document-section-header">{filename}</h1>\n'
+        section_header = f'<h1 class="document-section-header">{safe_filename}</h1>\n'
         merged_parts.append(section_header)
         merged_parts.append(html_body)
 
@@ -198,7 +204,13 @@ def convert_batch(
     output_path_obj = None
     if output_dir:
         output_path_obj = Path(output_dir)
-        output_path_obj.mkdir(parents=True, exist_ok=True)
+        # Use exist_ok=True to handle race conditions where directory might
+        # be created between check and creation (e.g., by another process)
+        try:
+            output_path_obj.mkdir(parents=True, exist_ok=True)
+        except (OSError, PermissionError) as e:
+            print(f"Error: Cannot create output directory '{output_dir}': {e}", file=sys.stderr)
+            return
 
     # 2. Process each file
     converted_files = []
@@ -228,9 +240,14 @@ def convert_batch(
             converted_files.append((input_file, output_file))
             print(f"[OK] Converted '{input_file}' to '{output_file}'")
 
-        except Exception as e:
+        except Md2PdfError as e:
+            # Catch all md2pdf-specific errors (file operations, conversion, validation, etc.)
             failed_files.append((input_file, str(e)))
             print(f"[FAILED] '{input_file}': {e}", file=sys.stderr)
+        except (OSError, IOError, PermissionError) as e:
+            # Catch system-level file errors
+            failed_files.append((input_file, f"System error: {e}"))
+            print(f"[FAILED] '{input_file}': System error: {e}", file=sys.stderr)
 
     # 3. Print summary
     print("\n--- Batch Conversion Summary ---")
@@ -307,9 +324,14 @@ def convert_merge(
             html_bodies.append((input_path.name, html_body))
             print(f"[OK] Processed '{input_file}'")
 
-        except Exception as e:
+        except Md2PdfError as e:
+            # Catch all md2pdf-specific errors (file operations, conversion, validation, etc.)
             failed_files.append((input_file, str(e)))
             print(f"[FAILED] '{input_file}': {e}", file=sys.stderr)
+        except (OSError, IOError, PermissionError) as e:
+            # Catch system-level file errors
+            failed_files.append((input_file, f"System error: {e}"))
+            print(f"[FAILED] '{input_file}': System error: {e}", file=sys.stderr)
 
     # 3. Check if we have at least one successful file
     if not html_bodies:

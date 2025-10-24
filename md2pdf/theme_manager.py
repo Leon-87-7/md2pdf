@@ -14,7 +14,7 @@ def get_themes_directory() -> Path:
     Returns:
         Path to the themes directory (in project root).
     """
-    return config.PACKAGE_DIR / config.THEMES_DIR_NAME
+    return config.THEMES_DIR
 
 
 def list_available_themes() -> list[str]:

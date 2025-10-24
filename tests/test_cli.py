@@ -63,7 +63,7 @@ class TestMain:
         mock_convert.assert_called_once_with("test.md", None, None, "default", False)
 
     @patch("md2pdf.cli.convert_md_to_pdf")
-    @patch("sys.argv", ["md2pdf", "test.md", "-o", "output.pdf"])
+    @patch("sys.argv", ["md2pdf", "test.md", "-on", "output.pdf"])
     def test_main_with_output(self, mock_convert):
         """Test CLI with output file specified."""
         cli.main()
@@ -126,7 +126,7 @@ class TestMain:
             cli.main()
 
     @patch("md2pdf.cli.convert_md_to_pdf")
-    @patch("sys.argv", ["md2pdf", "test.md", "--theme", "dark", "-o", "out.pdf", "-p"])
+    @patch("sys.argv", ["md2pdf", "test.md", "--theme", "dark", "-on", "out.pdf", "-p"])
     def test_main_all_options(self, mock_convert):
         """Test CLI with all options combined."""
         cli.main()
@@ -137,9 +137,9 @@ class TestMainArgumentParsing:
     """Test argument parsing edge cases."""
 
     @patch("md2pdf.cli.convert_md_to_pdf")
-    @patch("sys.argv", ["md2pdf", "test.md", "--output", "output.pdf"])
+    @patch("sys.argv", ["md2pdf", "test.md", "--output-name", "output.pdf"])
     def test_long_output_flag(self, mock_convert):
-        """Test --output long form."""
+        """Test --output-name long form."""
         cli.main()
         mock_convert.assert_called_once()
         args = mock_convert.call_args[0]

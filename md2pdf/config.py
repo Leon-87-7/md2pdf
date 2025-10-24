@@ -3,11 +3,14 @@
 from pathlib import Path
 
 # Version
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 # Paths
 THEMES_DIR_NAME = "themes"
-PACKAGE_DIR = Path(__file__).parent.parent  # Go up to project root
+# Package directory (where this config.py file is located)
+PACKAGE_DIR = Path(__file__).parent
+# Themes directory is relative to package directory
+THEMES_DIR = PACKAGE_DIR.parent / THEMES_DIR_NAME
 
 # Markdown extensions for python-markdown library
 MARKDOWN_EXTENSIONS = ["extra", "codehilite", "tables", "toc"]

@@ -9,7 +9,9 @@
 - **Batch processing** - convert multiple files to separate PDFs
 - **Merge mode** - combine multiple Markdown files into a single PDF
 - **5 pre-built themes** (default, dark, light, minimal, professional)
+- **Interactive theme builder** - create custom themes with guided wizard (`--create-theme`)
 - **Theme discovery** with `--theme-list` flag to list all available themes
+- **Accessibility-first** - built-in WCAG contrast checking for custom themes
 - Beautiful default styling with professional typography
 - Support for custom CSS styling
 - Handles tables, code blocks, lists, and images
@@ -20,7 +22,7 @@
 - **Preview mode** (`-p`) to auto-open PDFs after generation
 - **Auto-detection** of wkhtmltopdf across all platforms
 - **Modular architecture** with clean separation of concerns
-- **Comprehensive test suite** with 116 tests and 69% code coverage
+- **Comprehensive test suite** with 228 tests and 76% code coverage
 
 ## Prerequisites
 
@@ -81,7 +83,7 @@ This creates `document.pdf` in the same directory.
 ### Specify Output File
 
 ```bash
-md2pdf input.md -o output.pdf
+md2pdf input.md -on output.pdf
 ```
 
 ### Theme Selection
@@ -101,6 +103,61 @@ md2pdf document.md --theme light         # Light theme
 md2pdf document.md --theme minimal       # Minimal clean theme
 md2pdf document.md --theme professional  # Professional business theme
 ```
+
+### Creating Custom Themes
+
+Create your own theme interactively with the built-in theme builder:
+
+```bash
+md2pdf --create-theme
+```
+
+The wizard will guide you through creating a custom theme:
+
+```
+╔══════════════════════════════════════════════╗
+║     md2pdf Interactive Theme Builder         ║
+╚══════════════════════════════════════════════╝
+
+Theme name: my_theme
+✓ Name available
+
+Background color [#ffffff]: white
+✓ Using: #ffffff
+
+Text color [#000000]:
+✓ Using: #000000
+✓ Contrast ratio: 21:1 (Excellent - WCAG AAA)
+
+Font family [Arial, sans-serif]: Georgia
+✓ Using: Georgia
+
+Body text size [11pt]: 12
+✓ Using: 12pt
+
+H1 heading color [#2c3e50]: #1a2332
+✓ Using: #1a2332
+✓ Contrast ratio: 12.8:1 (Excellent - WCAG AAA)
+
+... (more prompts) ...
+
+✓ CSS file created: themes/my_theme.css
+✓ Theme ready to use!
+
+Usage:
+  md2pdf document.md --theme my_theme
+```
+
+**Theme Builder Features:**
+- Guided prompts for 10 theme properties (colors, fonts, sizes)
+- Real-time WCAG contrast checking (ensures 4.5:1 minimum ratio)
+- Smart defaults - press Enter to accept
+- Separate controls for H1 vs H2-H6 heading colors
+- Automatic validation and conflict detection
+- Generates complete CSS with all required selectors
+- Works immediately with all conversion modes
+
+**Accessibility:** All generated themes meet WCAG AA standards for color contrast, ensuring your PDFs are readable by everyone.
 
 ### Custom CSS Styling
 
@@ -143,7 +200,7 @@ md2pdf *.md --output-dir pdfs/
 Combine multiple Markdown files into a single PDF:
 
 ```bash
-md2pdf chapter1.md chapter2.md chapter3.md --merge -o book.pdf
+md2pdf chapter1.md chapter2.md chapter3.md --merge -on book.pdf
 ```
 
 Each source file becomes a section in the merged PDF, with automatic page breaks between sections.
@@ -151,33 +208,34 @@ Each source file becomes a section in the merged PDF, with automatic page breaks
 Disable automatic page breaks between merged sections:
 
 ```bash
-md2pdf intro.md content.md --merge --no-auto-break -o document.pdf
+md2pdf intro.md content.md --merge --no-auto-break -on document.pdf
 ```
 
 ### Command Line Options
 
 ```
-usage: md2pdf [-h] [-o OUTPUT] [--output-dir OUTPUT_DIR] [--theme THEME]
-              [--theme-list] [--css CSS] [-p] [--merge] [--no-auto-break] [-v]
-              input [input ...]
+usage: md2pdf [-h] [-on OUTPUT_NAME] [-od OUTPUT_DIR] [-th THEME] [-thl] [--create-theme]
+              [-c CSS] [-p] [-m] [-nab] [-v] [input ...]
 
 positional arguments:
   input                 Path to input Markdown file(s). Multiple files triggers batch mode
 
 optional arguments:
   -h, --help            show this help message and exit
-  -o OUTPUT, --output OUTPUT
+  -on, --output-name OUTPUT_NAME
                         Output PDF file (single file mode or merge mode only)
-  --output-dir OUTPUT_DIR
+  -od, --output-dir OUTPUT_DIR
                         Output directory for batch mode
-  --theme THEME         Theme to use for styling (default: default)
+  -th, --theme THEME    Theme to use for styling (default: default)
                         Ignored if --css is specified
-  --theme-list, -thl    List all available themes and exit
-  --css CSS             Path to a custom CSS file for styling the PDF
+  -thl, --theme-list    List all available themes and exit
+  --create-theme        Launch interactive theme builder wizard and exit
+  -c, --css CSS         Path to a custom CSS file for styling the PDF
                         Takes precedence over --theme
   -p, --preview         Open the PDF with the default viewer after conversion
-  --merge               Merge multiple input files into a single PDF (requires 2+ files)
-  --no-auto-break       Disable automatic page breaks between merged documents
+  -m, --merge           Merge multiple input files into a single PDF (requires 2+ files)
+  -nab, --no-auto-break
+                        Disable automatic page breaks between merged documents
   -v, --version         show program's version number and exit
 ```
 
@@ -192,7 +250,7 @@ md2pdf README.md
 ### Example 2: Custom Output Location
 
 ```bash
-md2pdf docs/guide.md -o pdfs/user-guide.pdf
+md2pdf docs/guide.md -on pdfs/user-guide.pdf
 ```
 
 ### Example 3: Listing Available Themes
@@ -227,7 +285,16 @@ md2pdf document.md -p
 md2pdf presentation.md --theme dark -p
 ```
 
-### Example 8: Batch Processing
+### Example 8: Creating a Custom Theme
+
+```bash
+md2pdf --create-theme
+# Follow the interactive prompts to create your theme
+# Then use it:
+md2pdf document.md --theme my_custom_theme
+```
+
+### Example 9: Batch Processing
 
 Convert multiple files to separate PDFs:
 
@@ -241,18 +308,18 @@ Convert with output directory:
 md2pdf docs/*.md --output-dir pdfs/ --theme professional
 ```
 
-### Example 9: Merge Files into Single PDF
+### Example 10: Merge Files into Single PDF
 
 Merge with automatic page breaks between sections:
 
 ```bash
-md2pdf intro.md methods.md results.md conclusion.md --merge -o research_paper.pdf
+md2pdf intro.md methods.md results.md conclusion.md --merge -on research_paper.pdf
 ```
 
 Merge without page breaks:
 
 ```bash
-md2pdf part1.md part2.md --merge --no-auto-break -o continuous_document.pdf --theme dark
+md2pdf part1.md part2.md --merge --no-auto-break -on continuous_document.pdf --theme dark
 ```
 
 ## Themes
@@ -421,7 +488,7 @@ And this will be on a third page.
 
 ### Running Tests
 
-md2pdf includes a comprehensive test suite with **116 tests** and **69% code coverage**.
+md2pdf includes a comprehensive test suite with **228 tests** (76% coverage) covering all functionality.
 
 Install development dependencies:
 
@@ -479,41 +546,6 @@ If you get an error about a theme not being found:
 1. Ensure the `themes/` directory exists in the same location as `md2pdf.py`
 2. Check that the theme file exists (e.g., `themes/default.css`)
 3. The tool will list available themes if the requested theme is not found
-
-## Future features
-
-### Priority Order:
-
-- Preview Mode (Priority 1) ✅ COMPLETED
-  Auto-open PDF after conversion with -p flag
-
-- Auto-detect wkhtmltopdf (Priority 2) ✅ COMPLETED
-  Automatically find wkhtmltopdf installation across platforms
-  Checks system PATH and common installation locations for Windows, macOS, and Linux
-  Provides helpful platform-specific error messages if not found
-
-- Page Breaks (Priority 3) ✅ COMPLETED
-  Support explicit page break markers in Markdown
-  Supports multiple formats: <!-- pagebreak -->, <!-- page-break -->, case-insensitive
-  Uses CSS page-break-after to create new pages in PDF
-
-- Multiple CSS Themes via --theme (Priority 4) ✅ COMPLETED
-  Theme system with --theme flag
-  Themes stored in external CSS files in themes/ directory
-  Custom CSS takes precedence over themes
-  Type hints and improved error handling throughout codebase
-
-- Batch Processing (Priority 5) ✅ COMPLETED
-  Convert multiple files to separate PDFs
-  md2pdf file1.md file2.md file3.md → creates file1.pdf, file2.pdf, file3.pdf
-  Support for --output-dir to specify output directory for batch conversions
-  Efficient processing with shared setup for all files
-
-- Merge Mode (Priority 6) ✅ COMPLETED
-  Combine multiple MD files into single PDF with --merge flag
-  md2pdf chapter1.md chapter2.md --merge -o book.pdf
-  Automatic page breaks between sections (optional with --no-auto-break)
-  Section headers showing source filenames
 
 ## License
 
