@@ -4,41 +4,65 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**md2pdf** is a Python CLI tool that converts Markdown files to professionally-styled PDF documents. It's a single-file application ([md2pdf.py](md2pdf.py)) that uses `markdown` for parsing and `pdfkit` (which wraps `wkhtmltopdf`) for PDF generation.
+**md2pdf** is a Python CLI tool that converts Markdown files to professionally-styled PDF documents. It's a modular package with clean separation of concerns, supporting single-file conversion, batch processing, and merge mode with 5 pre-built themes.
 
 ## Architecture
 
-### Core Components
+### Package Structure
 
-The application consists of a single Python module with four main functions:
+The project uses a modular architecture with specialized modules:
 
-1. **`find_wkhtmltopdf()`** ([md2pdf.py:14-54](md2pdf.py#L14-L54)): Auto-detects wkhtmltopdf installation across platforms by checking:
-   - System PATH (using `shutil.which`)
-   - Common installation locations for Windows, macOS, and Linux
-2. **`get_default_css()`**: Returns the default CSS styling with gradient backgrounds and professional typography
-3. **`convert_md_to_pdf()`**: Main conversion logic that:
-   - Verifies wkhtmltopdf is available
-   - Reads the Markdown file
-   - Converts MD to HTML using the `markdown` library with extensions: `extra`, `codehilite`, `tables`, `toc`
-   - Applies CSS styling (default or custom)
-   - Generates PDF via `pdfkit`
-4. **`main()`**: CLI entry point using `argparse`
+```
+md2pdf/
+├── md2pdf/                    # Main package
+│   ├── cli.py                # CLI interface (argparse)
+│   ├── core.py               # Conversion orchestrator (3 modes: single, batch, merge)
+│   ├── config.py             # Configuration & constants
+│   ├── markdown_processor.py # Markdown → HTML conversion
+│   ├── pdf_engine.py         # PDF generation (wkhtmltopdf wrapper)
+│   ├── theme_manager.py      # Theme & CSS loading
+│   ├── file_operations.py    # File I/O operations
+│   └── exceptions.py         # Custom exception classes
+├── themes/                    # CSS theme files (5 themes)
+├── tests/                     # Pytest test suite (116 tests, 69% coverage)
+└── docs/                      # Architecture and testing documentation
+```
+
+### Core Modules
+
+**[cli.py](md2pdf/cli.py)**: Argument parsing with support for:
+- Single file: `-on/--output-name` for output file
+- Batch mode: `-od/--output-dir` for output directory
+- Merge mode: `-m/--merge` to combine files, `-nab/--no-auto-break` to disable page breaks
+- Themes: `-th/--theme` to select theme, `-thl/--theme-list` to list themes
+- Preview: `-p/--preview` to auto-open PDF
+
+**[core.py](md2pdf/core.py)**: Main orchestrator with three conversion functions:
+- `convert_md_to_pdf()`: Single file conversion
+- `convert_batch()`: Multiple files → separate PDFs
+- `convert_merge()`: Multiple files → single merged PDF
+
+**[pdf_engine.py](md2pdf/pdf_engine.py)**: wkhtmltopdf wrapper
+- `find_wkhtmltopdf()`: Auto-detect installation across platforms
+- Checks system PATH and common installation paths for Windows, macOS, Linux
+
+**[theme_manager.py](md2pdf/theme_manager.py)**: Theme system
+- Themes stored in `themes/` directory as CSS files
+- `list_available_themes()`: Returns list of theme names
+- Custom CSS takes precedence over themes
 
 ### Dependencies
 
-- **wkhtmltopdf**: External system dependency required for PDF generation
-  - **Auto-detected** at runtime using `find_wkhtmltopdf()` ([md2pdf.py:14-54](md2pdf.py#L14-L54))
-  - Checks system PATH and common installation locations for Windows, macOS, and Linux
-  - Provides helpful installation instructions if not found
-- **Python packages**: `markdown>=3.4`, `pdfkit>=1.0.0` (see [requirements.txt](requirements.txt))
+- **wkhtmltopdf**: External system dependency (auto-detected at runtime)
+- **Python packages**: `markdown>=3.4`, `pdfkit>=1.0.0`
 
 ## Development Commands
 
 ### Installation
 
 ```bash
-# Install in editable mode (recommended for development)
-pip install -e .
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
 
 # Or install dependencies manually
 pip install -r requirements.txt
@@ -47,23 +71,37 @@ pip install -r requirements.txt
 ### Running the Tool
 
 ```bash
-# Basic conversion
+# Single file conversion
 md2pdf input.md
+md2pdf input.md -on output.pdf
+md2pdf input.md --theme dark -p
 
-# With custom output path
-md2pdf input.md -o output.pdf
+# Batch processing
+md2pdf file1.md file2.md file3.md
+md2pdf *.md --output-dir pdfs/
 
-# With custom CSS
-md2pdf input.md --css custom.css
+# Merge mode
+md2pdf ch1.md ch2.md ch3.md --merge -on book.pdf
+md2pdf *.md --merge --no-auto-break -on combined.pdf
+
+# Theme management
+md2pdf --theme-list
 ```
 
-### Testing the Tool
+### Testing
 
 ```bash
-# Test basic conversion (no test suite currently exists)
-md2pdf README.md
+# Run full test suite (116 tests)
+pytest
 
-# Verify the generated PDF opens correctly
+# Run with coverage report
+pytest --cov
+
+# Run specific test file
+pytest tests/test_cli.py
+
+# Run verbose
+pytest -v
 ```
 
 ## wkhtmltopdf Installation
