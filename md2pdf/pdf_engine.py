@@ -3,12 +3,15 @@
 import platform
 import shutil
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import pdfkit
 
 from . import config
 from .exceptions import ConversionError
+
+# Type alias for pdfkit configuration (pdfkit lacks type stubs)
+PdfKitConfig = Any
 
 
 def find_wkhtmltopdf() -> Optional[str]:
@@ -40,7 +43,7 @@ def find_wkhtmltopdf() -> Optional[str]:
     return None
 
 
-def create_pdf_configuration(wkhtmltopdf_path: str) -> pdfkit.configuration:
+def create_pdf_configuration(wkhtmltopdf_path: str) -> PdfKitConfig:
     """Create pdfkit configuration object.
 
     Args:
@@ -48,6 +51,9 @@ def create_pdf_configuration(wkhtmltopdf_path: str) -> pdfkit.configuration:
 
     Returns:
         pdfkit.configuration object
+
+    Note:
+        Return type uses Any because pdfkit lacks type stubs.
     """
     return pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
 
@@ -76,7 +82,7 @@ def get_installation_instructions() -> str:
 def convert_html_to_pdf(
     html_content: str,
     output_path: Path,
-    pdf_config,
+    pdf_config: PdfKitConfig,
 ) -> None:
     """Convert HTML content to PDF file using wkhtmltopdf.
 
@@ -102,7 +108,13 @@ def convert_html_to_pdf(
     except Exception as e:
         error_msg = f"Error generating PDF: {e}\n\n"
         error_msg += "Troubleshooting tips:\n"
-        error_msg += "1. Try using a simpler output filename without special characters\n"
-        error_msg += "2. Ensure wkhtmltopdf is properly installed and accessible\n"
-        error_msg += "3. Try removing images or complex formatting from the markdown"
+        error_msg += "1. Check file permissions - ensure you can write to the output directory\n"
+        error_msg += "2. Try using a simpler output filename without special characters or spaces\n"
+        error_msg += "   - Windows: Wrap paths with spaces in quotes\n"
+        error_msg += "   - Example: md2pdf input.md -on \"My Document.pdf\"\n"
+        error_msg += "3. Ensure wkhtmltopdf is properly installed and up-to-date\n"
+        error_msg += "   - Run 'wkhtmltopdf --version' to verify installation\n"
+        error_msg += "   - Consider updating if you're using an old version\n"
+        error_msg += "4. Try removing images or complex formatting from the markdown\n"
+        error_msg += "5. Check if the output path is valid and accessible"
         raise ConversionError(error_msg) from e
