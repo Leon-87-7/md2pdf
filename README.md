@@ -157,27 +157,27 @@ md2pdf intro.md content.md --merge --no-auto-break -o document.pdf
 ### Command Line Options
 
 ```
-usage: md2pdf [-h] [-o OUTPUT] [--output-dir OUTPUT_DIR] [--theme THEME]
-              [--theme-list] [--css CSS] [-p] [--merge] [--no-auto-break] [-v]
-              input [input ...]
+usage: md2pdf [-h] [-on OUTPUT_NAME] [-od OUTPUT_DIR] [-th THEME] [-thl] [-c CSS] [-p] [-m]
+              [-nab] [-v] [input ...]
 
 positional arguments:
   input                 Path to input Markdown file(s). Multiple files triggers batch mode
 
 optional arguments:
   -h, --help            show this help message and exit
-  -o OUTPUT, --output OUTPUT
+  -on, --output-name OUTPUT_NAME
                         Output PDF file (single file mode or merge mode only)
-  --output-dir OUTPUT_DIR
+  -od, --output-dir OUTPUT_DIR
                         Output directory for batch mode
-  --theme THEME         Theme to use for styling (default: default)
+  -th, --theme THEME    Theme to use for styling (default: default)
                         Ignored if --css is specified
-  --theme-list, -thl    List all available themes and exit
-  --css CSS             Path to a custom CSS file for styling the PDF
+  -thl, --theme-list    List all available themes and exit
+  -c, --css CSS         Path to a custom CSS file for styling the PDF
                         Takes precedence over --theme
   -p, --preview         Open the PDF with the default viewer after conversion
-  --merge               Merge multiple input files into a single PDF (requires 2+ files)
-  --no-auto-break       Disable automatic page breaks between merged documents
+  -m, --merge           Merge multiple input files into a single PDF (requires 2+ files)
+  -nab, --no-auto-break
+                        Disable automatic page breaks between merged documents
   -v, --version         show program's version number and exit
 ```
 
@@ -479,41 +479,6 @@ If you get an error about a theme not being found:
 1. Ensure the `themes/` directory exists in the same location as `md2pdf.py`
 2. Check that the theme file exists (e.g., `themes/default.css`)
 3. The tool will list available themes if the requested theme is not found
-
-## Future features
-
-### Priority Order:
-
-- Preview Mode (Priority 1) ✅ COMPLETED
-  Auto-open PDF after conversion with -p flag
-
-- Auto-detect wkhtmltopdf (Priority 2) ✅ COMPLETED
-  Automatically find wkhtmltopdf installation across platforms
-  Checks system PATH and common installation locations for Windows, macOS, and Linux
-  Provides helpful platform-specific error messages if not found
-
-- Page Breaks (Priority 3) ✅ COMPLETED
-  Support explicit page break markers in Markdown
-  Supports multiple formats: <!-- pagebreak -->, <!-- page-break -->, case-insensitive
-  Uses CSS page-break-after to create new pages in PDF
-
-- Multiple CSS Themes via --theme (Priority 4) ✅ COMPLETED
-  Theme system with --theme flag
-  Themes stored in external CSS files in themes/ directory
-  Custom CSS takes precedence over themes
-  Type hints and improved error handling throughout codebase
-
-- Batch Processing (Priority 5) ✅ COMPLETED
-  Convert multiple files to separate PDFs
-  md2pdf file1.md file2.md file3.md → creates file1.pdf, file2.pdf, file3.pdf
-  Support for --output-dir to specify output directory for batch conversions
-  Efficient processing with shared setup for all files
-
-- Merge Mode (Priority 6) ✅ COMPLETED
-  Combine multiple MD files into single PDF with --merge flag
-  md2pdf chapter1.md chapter2.md --merge -o book.pdf
-  Automatic page breaks between sections (optional with --no-auto-break)
-  Section headers showing source filenames
 
 ## License
 

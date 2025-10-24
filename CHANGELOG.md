@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- CLI argument name corrected from `args.output` to `args.output_name` to match actual argument definition
+  - Changed argument from `-o/--output` to `-on/--output-name` for consistency
+  - Updated all code references in merge mode conversion
+  - Fixed AttributeError that occurred when using merge mode
+- Warning messages updated to reference correct `--output-name` flag instead of `--output`
+  - Batch mode now suggests `--output-dir` instead of incorrect `--output`
+  - Single file mode warnings now reference `--output-name` correctly
+
+### Changed
+
+- CLI argument definitions reorganized with short flags listed before long flags for consistency
+- Help text examples updated to use `-on` instead of `-o` for output file specification
+
+### Documentation
+
+- Updated CLAUDE.md to reflect current modular architecture
+  - Replaced outdated "single-file application" description with accurate modular package structure
+  - Added package structure diagram showing 9 specialized modules
+  - Documented all three conversion modes: single, batch, and merge
+  - Added comprehensive development commands including testing (116 tests, 69% coverage)
+  - Updated CLI argument documentation with correct flags (`-on`, `-od`, `-m`, etc.)
+
 ## [0.3.0] - 2025-10-23
 
 ### Added
