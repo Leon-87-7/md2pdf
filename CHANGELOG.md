@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Interactive Theme Builder** (`--create-theme`) - Create custom themes through guided CLI wizard
+  - **Color utilities module** (`color_utils.py`) with comprehensive color parsing and accessibility:
+    - Supports hex (#fff, #ffffff), named colors (white, red), and HSL (hsl(210, 50%, 20%))
+    - WCAG contrast ratio calculation following WebAIM standards
+    - Automatic contrast checking against WCAG AA (4.5:1) and AAA (7.0:1) compliance
+    - Smart color adjustment functions (darken/lighten by percentage)
+    - Accessible color suggestions to meet target contrast ratios
+    - 32 comprehensive tests with 94% code coverage
+  - **Theme builder module** (`theme_builder.py`) with interactive wizard:
+    - Guided prompts for 10 theme properties (name, colors, fonts, sizes)
+    - Real-time contrast validation with warnings for low-contrast combinations
+    - Smart defaults for all inputs - press Enter to accept defaults
+    - Separate color controls for H1 vs H2-H6 headings
+    - Automatic theme name validation and conflict detection
+    - Generates complete CSS with all required selectors
+    - Beautiful terminal UI with checkmarks (✓) and warnings (⚠)
+  - **CLI integration**: `--create-theme` flag launches wizard, exits after creation
+  - **Accessibility-first design**: All generated themes meet WCAG AA standards (4.5:1 minimum)
+  - Works seamlessly with all conversion modes (single, batch, merge)
+
 ### Fixed
 
 - CLI argument name corrected from `args.output` to `args.output_name` to match actual argument definition
@@ -16,11 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Warning messages updated to reference correct `--output-name` flag instead of `--output`
   - Batch mode now suggests `--output-dir` instead of incorrect `--output`
   - Single file mode warnings now reference `--output-name` correctly
+- Fixed 3 pre-existing CLI test failures that used old flag names (`-o`/`--output`)
 
 ### Changed
 
 - CLI argument definitions reorganized with short flags listed before long flags for consistency
 - Help text examples updated to use `-on` instead of `-o` for output file specification
+- Test suite expanded from 116 to 148 tests (added 32 color utility tests)
+- Package now includes 11 modules (added color_utils.py and theme_builder.py)
 
 ### Documentation
 
@@ -28,8 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Replaced outdated "single-file application" description with accurate modular package structure
   - Added package structure diagram showing 9 specialized modules
   - Documented all three conversion modes: single, batch, and merge
-  - Added comprehensive development commands including testing (116 tests, 69% coverage)
-  - Updated CLI argument documentation with correct flags (`-on`, `-od`, `-m`, etc.)
+  - Added comprehensive development commands including testing (148 tests)
+  - Updated CLI argument documentation with correct flags (`-on`, `-od`, `-m`, `--create-theme`)
 
 ## [0.3.0] - 2025-10-23
 

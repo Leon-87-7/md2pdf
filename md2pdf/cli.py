@@ -48,6 +48,7 @@ Example usage:
 
   # Theme management
   md2pdf --theme-list                                  # List all available themes
+  md2pdf --create-theme                                # Create a new theme interactively
   """,
     )
     parser.add_argument(
@@ -76,6 +77,11 @@ Example usage:
         "--theme-list",
         action="store_true",
         help="List all available themes and exit",
+    )
+    parser.add_argument(
+        "--create-theme",
+        action="store_true",
+        help="Launch interactive theme builder wizard and exit",
     )
     parser.add_argument(
         "-c",
@@ -111,7 +117,13 @@ Example usage:
         display_themes()
         return
 
-    # Require input file(s) if not listing themes
+    # Handle --create-theme flag
+    if args.create_theme:
+        from .theme_builder import run_theme_wizard
+        run_theme_wizard()
+        return
+
+    # Require input file(s) if not listing/creating themes
     if not args.input:
         parser.error("the following arguments are required: input")
 
@@ -167,7 +179,7 @@ Example usage:
                     file=sys.stderr,
                 )
             convert_md_to_pdf(
-                args.input[0], args.output, args.css, args.theme, args.preview
+                args.input[0], args.output_name, args.css, args.theme, args.preview
             )
     except Md2PdfError as e:
         print(f"Error: {e}", file=sys.stderr)
