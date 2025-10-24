@@ -65,14 +65,19 @@ def read_markdown_file(path: Path) -> str:
 
 
 def determine_output_path(input_path: Path, output_arg: Optional[str]) -> Path:
-    """Determine the output PDF path.
+    """Determine the output PDF path with enhanced security validation.
+
+    This function validates output paths to prevent security issues including:
+    - Path traversal attacks (../ sequences)
+    - Symlink attacks
+    - Writing outside the current working directory (for relative paths)
 
     Args:
         input_path: Path to input markdown file
         output_arg: Optional output path argument from CLI
 
     Returns:
-        Path where PDF should be saved
+        Path where PDF should be saved (always resolved to absolute path)
 
     Raises:
         InvalidInputError: If output path is invalid or attempts path traversal
@@ -82,32 +87,50 @@ def determine_output_path(input_path: Path, output_arg: Optional[str]) -> Path:
 
     output_path = Path(output_arg)
 
-    # Validate the output path to prevent path traversal attacks
-    # Check for dangerous path components
+    # Step 1: Check for explicit path traversal components before resolution
     if ".." in output_path.parts:
         raise InvalidInputError(
             f"Invalid output path '{output_arg}': path traversal (..) is not allowed"
         )
 
-    # Ensure the path is normalized and doesn't contain dangerous patterns
+    # Step 2: Resolve to absolute path (resolves symlinks and normalizes)
     try:
-        # Resolve to absolute path
-        resolved_path = output_path.resolve()
+        resolved_path = output_path.resolve(strict=False)
+    except (ValueError, OSError, RuntimeError) as e:
+        raise InvalidInputError(
+            f"Invalid output path '{output_arg}': cannot resolve path - {e}"
+        ) from e
 
-        # If a relative path was provided, ensure it resolves within current directory
+    # Step 3: If a relative path was provided, ensure it resolves within current directory
+    if not output_path.is_absolute():
+        cwd = Path.cwd().resolve()
+
+        # Check if the resolved path is within or equal to current working directory
+        try:
+            resolved_path.relative_to(cwd)
+        except ValueError:
+            raise InvalidInputError(
+                f"Invalid output path '{output_arg}': resolved path '{resolved_path}' "
+                f"is outside current directory '{cwd}'. Use an absolute path if you "
+                f"need to write outside the current directory."
+            )
+
+    # Step 4: Detect symlink traversal (if path doesn't exist yet, check parent)
+    check_path = resolved_path if resolved_path.exists() else resolved_path.parent
+    if check_path.exists() and check_path.is_symlink():
+        # For symlinks, verify the target stays within bounds
         if not output_path.is_absolute():
+            symlink_target = check_path.resolve()
             cwd = Path.cwd().resolve()
-            # Check if the resolved path is within or equal to current working directory
             try:
-                resolved_path.relative_to(cwd)
+                symlink_target.relative_to(cwd)
             except ValueError:
                 raise InvalidInputError(
-                    f"Invalid output path '{output_arg}': must be within current directory or use absolute path"
+                    f"Invalid output path '{output_arg}': symlink target points "
+                    f"outside current directory"
                 )
 
-        return resolved_path
-    except (ValueError, OSError) as e:
-        raise InvalidInputError(f"Invalid output path '{output_arg}': {e}") from e
+    return resolved_path
 
 
 def preview_file(pdf_path: Path) -> None:
