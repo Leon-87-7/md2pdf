@@ -32,6 +32,14 @@ h1 {
     padding-bottom: 0.3em;
 }
 
+#document-section-header {
+    font-size: 16pt;
+    text-transform: uppercase;
+    border-bottom: 2px solid #000000b5;
+    padding-bottom: 0.3em;
+    text-align: right;
+}
+
 h2 {
     font-size: 14pt;
     border-bottom: 1px solid #000000;

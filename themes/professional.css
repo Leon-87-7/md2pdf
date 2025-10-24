@@ -35,6 +35,16 @@ h1 {
     margin-bottom: 1em;
 }
 
+#document-section-header {
+    font-size: 20pt;
+    color: #2c3e50af;
+    padding: 12pt 0;
+    text-align: right;
+    font-weight: 600;
+    border-bottom: 2pt solid #2c3e50;
+    margin-bottom: 1em;
+}
+
 h2 {
     font-size: 18pt;
     color: #2c3e50;
