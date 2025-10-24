@@ -127,7 +127,7 @@ Example usage:
                 sys.exit(1)
             if args.output_dir:
                 print(
-                    "Warning: --output-dir flag is ignored in merge mode. Use --output instead.",
+                    "Warning: --output-dir flag is ignored in merge mode. Use --output-name instead.",
                     file=sys.stderr,
                 )
             auto_break = not args.no_auto_break
@@ -141,9 +141,9 @@ Example usage:
             )
         elif len(args.input) > 1:
             # Batch mode: convert multiple files to separate PDFs
-            if args.output:
+            if args.output_name:
                 print(
-                    "Warning: --output flag is ignored in batch mode. Use --output-dir instead.",
+                    "Warning: --output-name flag is ignored in batch mode. Use --output-dir instead.",
                     file=sys.stderr,
                 )
             if args.no_auto_break:
@@ -158,7 +158,7 @@ Example usage:
             # Single file mode
             if args.output_dir:
                 print(
-                    "Warning: --output-dir flag is ignored in single file mode. Use --output instead.",
+                    "Warning: --output-dir flag is ignored in single file mode. Use --output-name instead.",
                     file=sys.stderr,
                 )
             if args.no_auto_break:
