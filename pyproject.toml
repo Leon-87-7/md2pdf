@@ -1,6 +1,6 @@
 [project]
 name = "md2pdf"
-version = "0.2.1"
+version = "0.3.0"
 description = "Convert Markdown files to PDF with beautiful themes"
 readme = "README.md"
 license = {text = "MIT"}

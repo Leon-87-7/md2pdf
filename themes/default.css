@@ -33,6 +33,14 @@ h1 {
     font-weight: 700;
 }
 
+#document-section-header {
+    font-size: 28pt;
+    color: #2c3e50af;
+    padding: 20px;
+    text-align: right;
+    font-weight: 600;
+}
+
 h2 {
     font-size: 24pt;
     color: #2c3e50;
