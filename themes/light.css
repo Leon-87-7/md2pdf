@@ -35,7 +35,7 @@ h1 {
     border-bottom: 4px solid #667eea;
 }
 
-#document-section-header {
+.document-section-header {
     font-size: 28pt;
     color: #2c3e50af;
     padding: 20px;

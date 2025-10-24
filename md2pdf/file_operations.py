@@ -73,11 +73,41 @@ def determine_output_path(input_path: Path, output_arg: Optional[str]) -> Path:
 
     Returns:
         Path where PDF should be saved
+
+    Raises:
+        InvalidInputError: If output path is invalid or attempts path traversal
     """
     if output_arg is None:
         return input_path.with_suffix(".pdf")
-    else:
-        return Path(output_arg)
+
+    output_path = Path(output_arg)
+
+    # Validate the output path to prevent path traversal attacks
+    # Check for dangerous path components
+    if ".." in output_path.parts:
+        raise InvalidInputError(
+            f"Invalid output path '{output_arg}': path traversal (..) is not allowed"
+        )
+
+    # Ensure the path is normalized and doesn't contain dangerous patterns
+    try:
+        # Resolve to absolute path
+        resolved_path = output_path.resolve()
+
+        # If a relative path was provided, ensure it resolves within current directory
+        if not output_path.is_absolute():
+            cwd = Path.cwd().resolve()
+            # Check if the resolved path is within or equal to current working directory
+            try:
+                resolved_path.relative_to(cwd)
+            except ValueError:
+                raise InvalidInputError(
+                    f"Invalid output path '{output_arg}': must be within current directory or use absolute path"
+                )
+
+        return resolved_path
+    except (ValueError, OSError) as e:
+        raise InvalidInputError(f"Invalid output path '{output_arg}': {e}") from e
 
 
 def preview_file(pdf_path: Path) -> None:
@@ -85,19 +115,46 @@ def preview_file(pdf_path: Path) -> None:
 
     Args:
         pdf_path: Path to the PDF file to open
+
+    Note:
+        This function validates the PDF path exists and is a file before
+        attempting to open it. Subprocess calls include timeout protection.
     """
+    # Validate the PDF path before attempting to open
+    if not pdf_path.exists():
+        print(f"Warning: PDF file does not exist: {pdf_path}", file=sys.stderr)
+        return
+
+    if not pdf_path.is_file():
+        print(f"Warning: Path is not a file: {pdf_path}", file=sys.stderr)
+        return
+
     try:
         system = platform.system()
 
         if system == "Windows":
+            # os.startfile is Windows-specific and relatively safe
+            # It validates the path and uses the default file association
             os.startfile(str(pdf_path))
         elif system == "Darwin":  # macOS
-            subprocess.run(["open", str(pdf_path)], check=True)
+            # Use timeout to prevent hanging
+            subprocess.run(
+                ["open", str(pdf_path)],
+                check=True,
+                timeout=10,  # 10 second timeout
+            )
         elif system == "Linux":
-            subprocess.run(["xdg-open", str(pdf_path)], check=True)
+            # Use timeout to prevent hanging
+            subprocess.run(
+                ["xdg-open", str(pdf_path)],
+                check=True,
+                timeout=10,  # 10 second timeout
+            )
         else:
             print(
                 f"Warning: Unable to open PDF on {system} platform", file=sys.stderr
             )
+    except subprocess.TimeoutExpired:
+        print(f"Warning: Timeout opening PDF: {pdf_path}", file=sys.stderr)
     except (OSError, subprocess.CalledProcessError) as e:
         print(f"Warning: Could not open PDF: {e}", file=sys.stderr)

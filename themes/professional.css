@@ -35,7 +35,7 @@ h1 {
     margin-bottom: 1em;
 }
 
-#document-section-header {
+.document-section-header {
     font-size: 20pt;
     color: #2c3e50af;
     padding: 12pt 0;

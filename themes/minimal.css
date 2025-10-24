@@ -32,7 +32,7 @@ h1 {
     padding-bottom: 0.3em;
 }
 
-#document-section-header {
+.document-section-header {
     font-size: 16pt;
     text-transform: uppercase;
     border-bottom: 2px solid #000000b5;

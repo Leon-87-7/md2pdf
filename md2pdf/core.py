@@ -1,5 +1,6 @@
 """Core conversion orchestrator for md2pdf."""
 
+import html
 import sys
 from pathlib import Path
 from typing import Optional
@@ -62,12 +63,17 @@ def _merge_html_bodies(html_bodies: list[tuple[str, str]], auto_break: bool = Tr
 
     Returns:
         Merged HTML body string
+
+    Note:
+        Filenames are HTML-escaped to prevent injection attacks.
     """
     merged_parts = []
 
     for i, (filename, html_body) in enumerate(html_bodies):
+        # Escape filename to prevent HTML injection
+        safe_filename = html.escape(filename)
         # Add a section header with the filename
-        section_header = f'<h1 class="document-section-header">{filename}</h1>\n'
+        section_header = f'<h1 class="document-section-header">{safe_filename}</h1>\n'
         merged_parts.append(section_header)
         merged_parts.append(html_body)
 

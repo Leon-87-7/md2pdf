@@ -121,6 +121,34 @@ class TestDetermineOutputPath:
 
         assert output_path.parent.name == "subdir"
 
+    def test_determine_output_path_rejects_path_traversal(self, temp_dir):
+        """Test that path traversal attempts are rejected."""
+        input_path = temp_dir / "input.md"
+        # Try to write outside current directory using ..
+        output_arg = "../../../etc/passwd.pdf"
+
+        with pytest.raises(InvalidInputError) as exc_info:
+            file_operations.determine_output_path(input_path, output_arg)
+        assert "path traversal" in str(exc_info.value).lower()
+
+    def test_determine_output_path_allows_absolute_path(self, temp_dir):
+        """Test that absolute paths are allowed."""
+        input_path = temp_dir / "input.md"
+        output_arg = str(temp_dir / "output.pdf")
+        output_path = file_operations.determine_output_path(input_path, output_arg)
+
+        assert output_path.is_absolute()
+        assert output_path.name == "output.pdf"
+
+    def test_determine_output_path_normalizes_path(self, temp_dir):
+        """Test that output paths are normalized."""
+        input_path = temp_dir / "input.md"
+        output_arg = "output.pdf"
+        output_path = file_operations.determine_output_path(input_path, output_arg)
+
+        # Should be resolved to absolute path
+        assert output_path.is_absolute()
+
 
 class TestPreviewFile:
     """Test PDF preview functionality."""
@@ -145,7 +173,7 @@ class TestPreviewFile:
         pdf_path.write_text("fake pdf", encoding="utf-8")
 
         file_operations.preview_file(pdf_path)
-        mock_run.assert_called_once_with(["open", str(pdf_path)], check=True)
+        mock_run.assert_called_once_with(["open", str(pdf_path)], check=True, timeout=10)
 
     @patch("platform.system")
     @patch("subprocess.run")
@@ -156,7 +184,7 @@ class TestPreviewFile:
         pdf_path.write_text("fake pdf", encoding="utf-8")
 
         file_operations.preview_file(pdf_path)
-        mock_run.assert_called_once_with(["xdg-open", str(pdf_path)], check=True)
+        mock_run.assert_called_once_with(["xdg-open", str(pdf_path)], check=True, timeout=10)
 
     @patch("platform.system")
     def test_preview_file_unknown_platform(self, mock_system, temp_dir, capsys):
@@ -178,9 +206,44 @@ class TestPreviewFile:
         mock_system.return_value = "Windows"
         mock_startfile.side_effect = OSError("File not found")
         pdf_path = temp_dir / "test.pdf"
+        pdf_path.write_text("fake pdf", encoding="utf-8")
 
         file_operations.preview_file(pdf_path)
         captured = capsys.readouterr()
 
         assert "Warning" in captured.err
         assert "Could not open PDF" in captured.err
+
+    def test_preview_file_nonexistent(self, temp_dir, capsys):
+        """Test preview with non-existent file."""
+        pdf_path = temp_dir / "nonexistent.pdf"
+
+        file_operations.preview_file(pdf_path)
+        captured = capsys.readouterr()
+
+        assert "Warning" in captured.err
+        assert "does not exist" in captured.err
+
+    def test_preview_file_not_a_file(self, temp_dir, capsys):
+        """Test preview with directory instead of file."""
+        file_operations.preview_file(temp_dir)
+        captured = capsys.readouterr()
+
+        assert "Warning" in captured.err
+        assert "not a file" in captured.err
+
+    @patch("platform.system")
+    @patch("subprocess.run")
+    def test_preview_file_timeout(self, mock_run, mock_system, temp_dir, capsys):
+        """Test preview handles timeout gracefully."""
+        import subprocess
+        mock_system.return_value = "Linux"
+        mock_run.side_effect = subprocess.TimeoutExpired("xdg-open", 10)
+        pdf_path = temp_dir / "test.pdf"
+        pdf_path.write_text("fake pdf", encoding="utf-8")
+
+        file_operations.preview_file(pdf_path)
+        captured = capsys.readouterr()
+
+        assert "Warning" in captured.err
+        assert "Timeout" in captured.err

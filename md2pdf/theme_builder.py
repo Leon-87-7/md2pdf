@@ -364,7 +364,7 @@ h1 {{
     border-left: 5px solid {props['accent_color']};
 }}
 
-#document-section-header {{
+.document-section-header {{
     font-size: 28pt;
     color: {props['h1_color']};
     padding: 20px;
