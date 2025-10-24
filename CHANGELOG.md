@@ -7,6 +7,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2025-10-24
+
+### Added
+
+- **Comprehensive test suite expansion** - 74 new tests added (154 → 228 total tests)
+  - New `test_theme_builder.py` with 40 tests for theme validation and CSS generation
+  - 26 new tests in `test_core.py` for batch and merge conversion modes
+  - 11 new security tests in `test_file_operations.py` for path traversal protection
+  - Test coverage improved from 15% to 76% (+61% improvement)
+  - Individual module improvements:
+    - `core.py`: 9% → 98% (+89%)
+    - `file_operations.py`: 19% → 80% (+61%)
+    - `theme_builder.py`: 0% → 33% (+33%)
+    - `pdf_engine.py`: 27% → 100% (+73%)
+    - `markdown_processor.py`: 54% → 100% (+46%)
+    - `color_utils.py`: 12% → 95% (+83%)
+    - `theme_manager.py`: 24% → 89% (+65%)
+    - `cli.py`: 14% → 67% (+53%)
+    - `exceptions.py`: 67% → 100% (+33%)
+    - `config.py`: 100% → 100%
+    - `__init__.py`: 100% → 100%
+
+### Fixed
+
+- **Enhanced path traversal protection** in `file_operations.py`
+  - Added 4-step validation process with comprehensive security checks
+  - Step 1: Check for explicit ".." components in path
+  - Step 2: Resolve to absolute path with symlink resolution
+  - Step 3: Validate relative paths stay within current working directory
+  - Step 4: Detect symlinks and validate their targets
+  - Prevents attacks: `../../etc/passwd`, symlink traversal, mixed attacks
+  - Improved error messages with specific guidance and resolved paths
+  - Builds on Phase 1 security fixes (commit d283be5)
+
+### Changed
+
+- **Improved error handling** in `core.py`
+  - Split exception handling into `Md2PdfError` vs system errors (`OSError`, `IOError`)
+  - Added specific error handling for directory creation failures
+  - Better error messages distinguishing app errors from system errors
+  - Added comment explaining `exist_ok=True` for race condition handling
+
+### Improved
+
+- **Enhanced wkhtmltopdf error messages** in `pdf_engine.py`
+  - Added 6 comprehensive troubleshooting tips for common issues
+  - Permission check instructions
+  - Windows path/space handling guidance (critical for Windows users)
+  - wkhtmltopdf version verification command
+  - Update recommendations
+  - Output directory validation
+  - Complex content debugging tips
+  - Added type hints for `PdfKitConfig` (pdfkit lacks type stubs)
+
+- **Better path configuration** in `config.py`
+  - Clarified `PACKAGE_DIR` comment (package dir, not project root)
+  - Added `THEMES_DIR` constant for better path management
+  - Improved code documentation
+
+- **Code quality improvements** in `theme_manager.py`
+  - Updated to use `config.THEMES_DIR` instead of manual path construction
+  - Better separation of concerns
+
+### Documentation
+
+- Updated CLAUDE.md to reflect v0.3.1 and current state
+  - Version references updated: 0.3.0 → 0.3.1
+  - Test coverage updated to 76% (from initial 15%)
+  - Added accurate test count: 228 tests across 9 test modules
+
+### Security
+
+- Phase 2 security enhancements with symlink detection and validation
+- Comprehensive security test suite (11 dedicated tests)
+- Path traversal protection hardened against edge cases
+- No breaking changes - fully backward compatible
+
 ### Added
 
 - **Interactive Theme Builder** (`--create-theme`) - Create custom themes through guided CLI wizard
@@ -260,7 +337,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Future features roadmap
 - CLAUDE.md for AI development assistance
 
-[unreleased]: https://github.com/leon-87-7/md2pdf/compare/v0.3.0...HEAD
+[unreleased]: https://github.com/leon-87-7/md2pdf/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/leon-87-7/md2pdf/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/leon-87-7/md2pdf/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/leon-87-7/md2pdf/compare/v0.1.0...v0.2.1
 [0.1.0]: https://github.com/leon-87-7/md2pdf/releases/tag/v0.1.0

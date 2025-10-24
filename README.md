@@ -22,7 +22,7 @@
 - **Preview mode** (`-p`) to auto-open PDFs after generation
 - **Auto-detection** of wkhtmltopdf across all platforms
 - **Modular architecture** with clean separation of concerns
-- **Comprehensive test suite** with 116 tests and 69% code coverage
+- **Comprehensive test suite** with 228 tests and 76% code coverage
 
 ## Prerequisites
 
@@ -488,7 +488,7 @@ And this will be on a third page.
 
 ### Running Tests
 
-md2pdf includes a comprehensive test suite with **148 tests** covering all functionality.
+md2pdf includes a comprehensive test suite with **228 tests** (76% coverage) covering all functionality.
 
 Install development dependencies:
 

@@ -29,12 +29,13 @@ md2pdf/
 │   └── professional.css
 ├── tests/                     # Comprehensive test suite
 │   ├── test_cli.py
-│   ├── test_color_utils.py   # NEW: 32 tests for color utilities
+│   ├── test_color_utils.py   # 32 tests for color utilities
 │   ├── test_config.py
 │   ├── test_core.py
 │   ├── test_file_operations.py
 │   ├── test_markdown_processor.py
 │   ├── test_pdf_engine.py
+│   ├── test_theme_builder.py # 40 tests for theme builder
 │   └── test_theme_manager.py
 ├── docs/                      # Documentation
 │   ├── ARCHITECTURE.md       # This file
@@ -585,6 +586,7 @@ Configuration centralized in `config.py`:
 **Total**: ~2,066 lines (vs 428 in original single file)
 **Growth**: Significant expansion with powerful new features
 **Organization**: 11 focused modules vs monolithic structure
+**Test Coverage**: 228 tests across 9 test modules (76% coverage)
 
 <!-- pagebreak -->
 
@@ -592,7 +594,7 @@ Configuration centralized in `config.py`:
 
 ## Testing Strategy
 
-md2pdf includes a **comprehensive pytest-based test suite** with **148 tests** covering all functionality.
+md2pdf includes a **comprehensive pytest-based test suite** with **228 tests** covering all functionality.
 
 ### Test Suite Structure
 
@@ -603,11 +605,12 @@ tests/
 ├── test_cli.py              # CLI interface tests (19 tests)
 ├── test_color_utils.py      # Color utilities tests (32 tests)
 ├── test_config.py           # Configuration module tests (9 tests)
-├── test_core.py             # Core orchestrator tests (20 tests)
-├── test_file_operations.py  # File I/O tests (17 tests)
+├── test_core.py             # Core orchestrator tests (46 tests)
+├── test_file_operations.py  # File I/O tests (28 tests)
 ├── test_markdown_processor.py # Markdown processing tests (20 tests)
 ├── test_pdf_engine.py       # PDF generation tests (15 tests)
-└── test_theme_manager.py    # Theme management tests (16 tests)
+├── test_theme_builder.py    # Theme builder tests (40 tests)
+└── test_theme_manager.py    # Theme management tests (19 tests)
 ```
 
 ### Coverage by Module
@@ -618,14 +621,14 @@ tests/
 | `config.py` | 100% | 9 |
 | `markdown_processor.py` | 100% | 20 |
 | `pdf_engine.py` | 100% | 15 |
-| `color_utils.py` | 94% | 32 |
-| `file_operations.py` | 93% | 17 |
-| `theme_manager.py` | 89% | 16 |
+| `color_utils.py` | 95% | 32 |
+| `theme_manager.py` | 89% | 19 |
+| `file_operations.py` | 80% | 28 |
+| `core.py` | 98% | 46 |
 | `cli.py` | 67% | 19 |
 | `exceptions.py` | 100% | ✓ |
-| `core.py` | 30% | 20 |
-| `theme_builder.py` | 0% | - (interactive) |
-| **TOTAL** | **54%** | **148** |
+| `theme_builder.py` | 33% | 40 |
+| **TOTAL** | **76%** | **228** |
 
 ### Running Tests
 
