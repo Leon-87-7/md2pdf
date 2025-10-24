@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**md2pdf** is a Python CLI tool that converts Markdown files to professionally-styled PDF documents. Version 0.3.0 features a modular architecture with clean separation of concerns, supporting single-file conversion, batch processing, and merge mode with 5 pre-built themes.
+**md2pdf** is a Python CLI tool that converts Markdown files to professionally-styled PDF documents. Version 0.3.1 features a modular architecture with clean separation of concerns, supporting single-file conversion, batch processing, and merge mode with 5 pre-built themes.
 
 ## Architecture
 
@@ -17,7 +17,7 @@ md2pdf/
 ├── md2pdf/                    # Main package
 │   ├── cli.py                # CLI interface (argparse)
 │   ├── core.py               # Conversion orchestrator (3 modes: single, batch, merge)
-│   ├── config.py             # Configuration & constants (version: 0.3.0)
+│   ├── config.py             # Configuration & constants (version: 0.3.1)
 │   ├── markdown_processor.py # Markdown → HTML conversion
 │   ├── pdf_engine.py         # PDF generation (wkhtmltopdf wrapper)
 │   ├── theme_manager.py      # Theme & CSS loading
@@ -26,7 +26,7 @@ md2pdf/
 │   ├── file_operations.py    # File I/O operations
 │   └── exceptions.py         # Custom exception classes
 ├── themes/                    # CSS theme files (5 themes)
-├── tests/                     # Pytest test suite (8 test modules, 54% coverage)
+├── tests/                     # Pytest test suite (154 tests across 8 modules, 55% coverage)
 └── docs/                      # Architecture and testing documentation
 ```
 
@@ -106,7 +106,7 @@ The project has a comprehensive test suite across 8 test modules:
 # Run full test suite
 pytest
 
-# Run with coverage report (currently 54% coverage)
+# Run with coverage report (currently 55% coverage)
 pytest --cov=md2pdf --cov-report=term-missing
 
 # Run specific test file
