@@ -132,3 +132,76 @@ class TestPrivateFunctions:
         with pytest.raises(ThemeNotFoundError) as exc_info:
             theme_manager._load_theme_css("invalid_theme")
         assert "invalid_theme" in str(exc_info.value)
+
+
+class TestThemeManagerErrors:
+    """Test error handling in theme_manager."""
+
+    def test_list_available_themes_nonexistent_directory(self, mocker):
+        """Test listing themes when themes directory doesn't exist."""
+        # Mock get_themes_directory to return a non-existent path
+        fake_path = Path("/nonexistent/themes")
+        mocker.patch("md2pdf.theme_manager.get_themes_directory", return_value=fake_path)
+
+        themes = theme_manager.list_available_themes()
+        assert themes == []
+
+    def test_load_theme_css_permission_error(self, mocker):
+        """Test handling of permission errors when loading theme."""
+        # Mock open to raise PermissionError
+        mocker.patch("builtins.open", side_effect=PermissionError("Access denied"))
+
+        with pytest.raises(FileOperationError) as exc_info:
+            theme_manager._load_theme_css("default")
+
+        assert "Error reading theme file" in str(exc_info.value)
+
+    def test_load_theme_css_io_error(self, mocker):
+        """Test handling of IO errors when loading theme."""
+        # Mock open to raise IOError
+        mocker.patch("builtins.open", side_effect=IOError("Disk error"))
+
+        with pytest.raises(FileOperationError) as exc_info:
+            theme_manager._load_theme_css("default")
+
+        assert "Error reading theme file" in str(exc_info.value)
+
+    def test_load_theme_css_unicode_decode_error(self, mocker):
+        """Test handling of unicode decode errors when loading theme."""
+        # Mock open to raise UnicodeDecodeError
+        mocker.patch("builtins.open", side_effect=UnicodeDecodeError("utf-8", b"", 0, 1, "invalid"))
+
+        with pytest.raises(FileOperationError) as exc_info:
+            theme_manager._load_theme_css("default")
+
+        assert "Error reading theme file" in str(exc_info.value)
+
+    def test_load_custom_css_permission_error(self, sample_css_file, mocker):
+        """Test handling of permission errors when loading custom CSS."""
+        # Mock open to raise PermissionError
+        mocker.patch("builtins.open", side_effect=PermissionError("Access denied"))
+
+        with pytest.raises(FileOperationError) as exc_info:
+            theme_manager._load_custom_css(str(sample_css_file))
+
+        assert "Error reading CSS file" in str(exc_info.value)
+
+    def test_load_custom_css_io_error(self, sample_css_file, mocker):
+        """Test handling of IO errors when loading custom CSS."""
+        # Mock open to raise IOError
+        mocker.patch("builtins.open", side_effect=IOError("Disk error"))
+
+        with pytest.raises(FileOperationError) as exc_info:
+            theme_manager._load_custom_css(str(sample_css_file))
+
+        assert "Error reading CSS file" in str(exc_info.value)
+
+    def test_load_custom_css_unicode_decode_error(self, sample_css_file, mocker):
+        """Test handling of unicode decode errors when loading custom CSS."""
+        # Mock open to raise UnicodeDecodeError
+        mocker.patch("builtins.open", side_effect=UnicodeDecodeError("utf-8", b"", 0, 1, "invalid"))
+
+        with pytest.raises(FileOperationError) as exc_info:
+            theme_manager._load_custom_css(str(sample_css_file))
+
+        assert "Error reading CSS file" in str(exc_info.value)
