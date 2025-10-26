@@ -1,5 +1,7 @@
 """Custom exceptions for md2pdf package."""
 
+from typing import List, Optional
+
 
 class Md2PdfError(Exception):
     """Base exception for all md2pdf errors."""
@@ -28,17 +30,17 @@ class FileOperationError(Md2PdfError):
 class ThemeNotFoundError(Md2PdfError):
     """Raised when a requested theme is not found."""
 
-    def __init__(self, theme: str, available_themes: list[str] | None = None):
+    def __init__(self, theme: str, available_themes: Optional[List[str]] = None) -> None:
         """Initialize ThemeNotFoundError.
 
         Args:
             theme: The theme name that was not found
             available_themes: Optional list of available themes
         """
-        self.theme = theme
-        self.available_themes = available_themes or []
+        self.theme: str = theme
+        self.available_themes: List[str] = available_themes or []
 
-        message = f"Theme '{theme}' not found."
+        message: str = f"Theme '{theme}' not found."
         if self.available_themes:
             message += f" Available themes: {', '.join(sorted(self.available_themes))}"
         else:

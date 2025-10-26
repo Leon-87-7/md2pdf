@@ -2,7 +2,7 @@
 
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from . import config
 from .exceptions import CSSNotFoundError, FileOperationError, ThemeNotFoundError
@@ -17,7 +17,7 @@ def get_themes_directory() -> Path:
     return config.THEMES_DIR
 
 
-def list_available_themes() -> list[str]:
+def list_available_themes() -> List[str]:
     """List all available theme names.
 
     Returns:
