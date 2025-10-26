@@ -3,7 +3,7 @@
 import html
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Any, List, Optional, Tuple
 
 from . import file_operations, markdown_processor, pdf_engine, theme_manager
 from .exceptions import Md2PdfError, WkhtmltopdfNotFoundError
@@ -11,7 +11,7 @@ from .exceptions import Md2PdfError, WkhtmltopdfNotFoundError
 
 def _setup_conversion_environment(
     custom_css: Optional[str] = None, theme: str = "default"
-) -> tuple:
+) -> Tuple[Any, str]:
     """Setup PDF engine and CSS once for efficiency.
 
     This function is shared by all conversion modes (single, batch, merge)
@@ -54,7 +54,7 @@ def _setup_conversion_environment(
     return pdf_config, css_content
 
 
-def _merge_html_bodies(html_bodies: list[tuple[str, str]], auto_break: bool = True) -> str:
+def _merge_html_bodies(html_bodies: List[Tuple[str, str]], auto_break: bool = True) -> str:
     """Merge multiple HTML body sections into a single HTML body.
 
     Args:
@@ -84,7 +84,7 @@ def _merge_html_bodies(html_bodies: list[tuple[str, str]], auto_break: bool = Tr
     return "\n".join(merged_parts)
 
 
-def _process_single_file(input_file: str, pdf_config, css_content: str) -> tuple:
+def _process_single_file(input_file: str, pdf_config: Any, css_content: str) -> Tuple[Path, str]:
     """Read and process a single markdown file to HTML.
 
     This function is shared by all conversion modes to process individual files.
@@ -166,7 +166,7 @@ def convert_md_to_pdf(
 
 
 def convert_batch(
-    input_files: list[str],
+    input_files: List[str],
     output_dir: Optional[str] = None,
     custom_css: Optional[str] = None,
     theme: str = "default",
@@ -268,7 +268,7 @@ def convert_batch(
 
 
 def convert_merge(
-    input_files: list[str],
+    input_files: List[str],
     output_file: Optional[str] = None,
     custom_css: Optional[str] = None,
     theme: str = "default",
