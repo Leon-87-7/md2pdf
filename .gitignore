@@ -11,3 +11,12 @@ wheels/
 
 # Generated PDFs
 *.pdf
+
+.claude
+# Test coverage reports --- IGNORE ---
+.coverage 
+htmlcov/ 
+coverage.json 
+.coverage.* 
+
+docs/learning_guides 
