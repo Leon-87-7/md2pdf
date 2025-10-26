@@ -445,3 +445,304 @@ class TestSaveTheme:
             theme_builder.save_theme("test-theme", "content")
 
         assert "Failed to save theme" in str(exc_info.value)
+
+
+class TestPrintHeader:
+    """Tests for print_header function."""
+
+    def test_print_header_outputs_title(self, capsys):
+        """Test that print_header outputs the wizard title."""
+        theme_builder.print_header()
+
+        captured = capsys.readouterr()
+        assert "md2pdf Interactive Theme Builder" in captured.out
+        assert "Let's create a custom theme" in captured.out
+
+
+class TestPromptWithValidation:
+    """Tests for prompt_with_validation function."""
+
+    def test_prompt_with_validation_accepts_default(self, mocker):
+        """Test that empty input returns default value."""
+        mocker.patch("builtins.input", return_value="")
+
+        result = theme_builder.prompt_with_validation(
+            "Test prompt",
+            "default_value",
+            allow_empty=True
+        )
+
+        assert result == "default_value"
+
+    def test_prompt_with_validation_accepts_user_input(self, mocker):
+        """Test that user input is returned."""
+        mocker.patch("builtins.input", return_value="user_value")
+
+        result = theme_builder.prompt_with_validation(
+            "Test prompt",
+            "default_value"
+        )
+
+        assert result == "user_value"
+
+    def test_prompt_with_validation_requires_input_when_not_empty(self, mocker):
+        """Test that empty input is rejected when allow_empty is False."""
+        # First call returns empty, second returns valid input
+        mocker.patch("builtins.input", side_effect=["", "valid_input"])
+
+        result = theme_builder.prompt_with_validation(
+            "Test prompt",
+            "default",
+            allow_empty=False
+        )
+
+        assert result == "valid_input"
+
+    def test_prompt_with_validation_runs_validator(self, mocker):
+        """Test that validator is called on user input."""
+        mocker.patch("builtins.input", return_value="#ff0000")
+
+        validator_called = []
+        def mock_validator(value):
+            validator_called.append(value)
+
+        result = theme_builder.prompt_with_validation(
+            "Test prompt",
+            "#000000",
+            validator=mock_validator
+        )
+
+        assert "#ff0000" in validator_called
+        assert result == "#ff0000"
+
+    def test_prompt_with_validation_retries_on_validation_error(self, mocker):
+        """Test that prompt retries when validator raises ValueError."""
+        # First input is invalid, second is valid
+        mocker.patch("builtins.input", side_effect=["invalid", "valid"])
+
+        def mock_validator(value):
+            if value == "invalid":
+                raise ValueError("Invalid value")
+
+        result = theme_builder.prompt_with_validation(
+            "Test prompt",
+            "default",
+            validator=mock_validator
+        )
+
+        assert result == "valid"
+
+
+class TestPromptThemeProperties:
+    """Tests for prompt_theme_properties function."""
+
+    def test_prompt_theme_properties_collects_all_properties(self, mocker):
+        """Test that prompt_theme_properties collects all required properties."""
+        # Mock all input prompts to return valid values
+        inputs = [
+            "my-theme",           # name
+            "#ffffff",            # background_color
+            "#000000",            # text_color
+            "Arial, sans-serif",  # font_family
+            "11pt",               # body_text_size
+            "#2c3e50",           # h1_color
+            "#34495e",           # h2_h6_color
+            "#3030ff",           # accent_color (high contrast version)
+            "#f5f5f5",           # code_bg_color
+            "#3030ff",           # table_header_bg
+        ]
+        mocker.patch("builtins.input", side_effect=inputs)
+        mocker.patch("md2pdf.theme_builder.list_available_themes", return_value=[])
+
+        props = theme_builder.prompt_theme_properties()
+
+        assert props["name"] == "my-theme"
+        assert props["background_color"] == "#ffffff"
+        assert props["text_color"] == "#000000"
+        assert props["font_family"] == "Arial, sans-serif"
+        assert props["body_text_size"] == "11pt"
+        assert props["h1_color"] == "#2c3e50"
+        assert props["h2_h6_color"] == "#34495e"
+        assert props["accent_color"] == "#3030ff"
+        assert props["code_bg_color"] == "#f5f5f5"
+        assert props["table_header_bg"] == "#3030ff"
+
+    def test_prompt_theme_properties_retries_on_low_contrast(self, mocker):
+        """Test that low contrast colors trigger retry."""
+        # First contrast check fails (returns False), second passes
+        inputs = [
+            "my-theme",
+            "#ffffff",      # background
+            "#fafafa",      # text (low contrast) - will fail
+            "#000000",      # text (retry)
+            "Arial",
+            "11",
+            "#000000",      # h1
+            "#000000",      # h2-h6
+            "#0000ff",      # accent
+            "#f5f5f5",
+            "#0000ff",
+        ]
+        mocker.patch("builtins.input", side_effect=inputs)
+        mocker.patch("md2pdf.theme_builder.list_available_themes", return_value=[])
+        # Mock check_contrast_and_warn to return False first time, True after
+        mocker.patch(
+            "md2pdf.theme_builder.check_contrast_and_warn",
+            side_effect=[False, True, True, True, True]
+        )
+
+        props = theme_builder.prompt_theme_properties()
+
+        # Should have retried and gotten black text
+        assert props["text_color"] == "#000000"
+
+
+class TestDisplaySummary:
+    """Tests for display_summary function."""
+
+    def test_display_summary_shows_all_properties(self, capsys):
+        """Test that summary displays all theme properties."""
+        props = {
+            "name": "test-theme",
+            "background_color": "#ffffff",
+            "text_color": "#000000",
+            "font_family": "Arial",
+            "body_text_size": "11pt",
+            "h1_color": "#2c3e50",
+            "h2_h6_color": "#34495e",
+            "accent_color": "#667eea",
+            "code_bg_color": "#f5f5f5",
+            "table_header_bg": "#667eea",
+        }
+
+        theme_builder.display_summary(props)
+
+        captured = capsys.readouterr()
+        assert "test-theme" in captured.out
+        assert "#ffffff" in captured.out
+        assert "#000000" in captured.out
+        assert "Arial" in captured.out
+
+    def test_display_summary_shows_accessibility_check(self, capsys):
+        """Test that summary shows WCAG AA compliance status."""
+        props = {
+            "name": "accessible-theme",
+            "background_color": "#ffffff",
+            "text_color": "#000000",
+            "font_family": "Arial",
+            "body_text_size": "11pt",
+            "h1_color": "#000000",
+            "h2_h6_color": "#000000",
+            "accent_color": "#0000ff",
+            "code_bg_color": "#f5f5f5",
+            "table_header_bg": "#0000ff",
+        }
+
+        theme_builder.display_summary(props)
+
+        captured = capsys.readouterr()
+        assert "WCAG AA" in captured.out
+
+    def test_display_summary_warns_on_inaccessible_colors(self, capsys):
+        """Test that summary warns when colors don't meet WCAG AA."""
+        props = {
+            "name": "low-contrast-theme",
+            "background_color": "#ffffff",
+            "text_color": "#cccccc",  # Low contrast
+            "font_family": "Arial",
+            "body_text_size": "11pt",
+            "h1_color": "#cccccc",
+            "h2_h6_color": "#cccccc",
+            "accent_color": "#cccccc",
+            "code_bg_color": "#f5f5f5",
+            "table_header_bg": "#cccccc",
+        }
+
+        theme_builder.display_summary(props)
+
+        captured = capsys.readouterr()
+        assert "⚠" in captured.out or "below WCAG AA" in captured.out
+
+
+class TestRunThemeWizard:
+    """Tests for run_theme_wizard function."""
+
+    def test_run_theme_wizard_creates_theme(self, temp_dir, mocker, capsys):
+        """Test that wizard creates a theme successfully."""
+        mocker.patch("md2pdf.theme_builder.get_themes_directory", return_value=temp_dir)
+        mocker.patch("md2pdf.theme_builder.list_available_themes", return_value=[])
+        # Mock Path.cwd() to return temp_dir for relative_to() call
+        mocker.patch("pathlib.Path.cwd", return_value=temp_dir)
+
+        # Mock all user inputs
+        inputs = [
+            "wizard-theme",
+            "#ffffff",
+            "#000000",
+            "Arial",
+            "11",
+            "#000000",
+            "#000000",
+            "#0000ff",
+            "#f5f5f5",
+            "#0000ff",
+            "y",  # Confirm creation
+        ]
+        mocker.patch("builtins.input", side_effect=inputs)
+
+        theme_builder.run_theme_wizard()
+
+        # Check that theme file was created
+        theme_file = temp_dir / "wizard-theme.css"
+        assert theme_file.exists()
+        content = theme_file.read_text()
+        assert "Theme: wizard-theme" in content
+
+    def test_run_theme_wizard_cancels_on_no(self, capsys, mocker):
+        """Test that wizard can be cancelled."""
+        mocker.patch("md2pdf.theme_builder.list_available_themes", return_value=[])
+
+        inputs = [
+            "cancel-theme",
+            "#ffffff",
+            "#000000",
+            "Arial",
+            "11",
+            "#000000",
+            "#000000",
+            "#0000ff",
+            "#f5f5f5",
+            "#0000ff",
+            "n",  # Cancel
+        ]
+        mocker.patch("builtins.input", side_effect=inputs)
+
+        theme_builder.run_theme_wizard()
+
+        captured = capsys.readouterr()
+        assert "cancelled" in captured.out.lower()
+
+    def test_run_theme_wizard_handles_keyboard_interrupt(self, capsys, mocker):
+        """Test that wizard handles Ctrl+C gracefully."""
+        mocker.patch("md2pdf.theme_builder.list_available_themes", return_value=[])
+        mocker.patch("builtins.input", side_effect=KeyboardInterrupt())
+
+        with pytest.raises(SystemExit) as exc_info:
+            theme_builder.run_theme_wizard()
+
+        assert exc_info.value.code == 0
+        captured = capsys.readouterr()
+        assert "cancelled" in captured.out.lower()
+
+    def test_run_theme_wizard_handles_general_exception(self, capsys, mocker):
+        """Test that wizard handles general exceptions."""
+        mocker.patch("md2pdf.theme_builder.list_available_themes", return_value=[])
+        mocker.patch("builtins.input", side_effect=RuntimeError("Unexpected error"))
+
+        with pytest.raises(SystemExit) as exc_info:
+            theme_builder.run_theme_wizard()
+
+        assert exc_info.value.code == 1
+        captured = capsys.readouterr()
+        # Error is printed to stderr
+        assert "Error" in captured.err or "X" in captured.err

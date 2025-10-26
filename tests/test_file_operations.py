@@ -407,3 +407,61 @@ class TestDetermineOutputPathSecurity:
         assert "path traversal" in error_msg.lower()
         # Should mention what was attempted
         assert "attack.pdf" in error_msg or ".." in error_msg
+
+
+class TestReadMarkdownFileErrors:
+    """Test error handling in read_markdown_file."""
+
+    def test_read_markdown_file_permission_error(self, temp_dir, mocker):
+        """Test handling of permission errors when reading file."""
+        test_file = temp_dir / "test.md"
+        test_file.write_text("# Test")
+
+        # Mock open to raise PermissionError
+        mocker.patch("builtins.open", side_effect=PermissionError("Access denied"))
+
+        with pytest.raises(FileOperationError) as exc_info:
+            file_operations.read_markdown_file(test_file)
+
+        assert "Error reading input file" in str(exc_info.value)
+
+    def test_read_markdown_file_io_error(self, temp_dir, mocker):
+        """Test handling of IO errors when reading file."""
+        test_file = temp_dir / "test.md"
+        test_file.write_text("# Test")
+
+        # Mock open to raise IOError
+        mocker.patch("builtins.open", side_effect=IOError("Disk error"))
+
+        with pytest.raises(FileOperationError) as exc_info:
+            file_operations.read_markdown_file(test_file)
+
+        assert "Error reading input file" in str(exc_info.value)
+
+    def test_read_markdown_file_unicode_decode_error(self, temp_dir):
+        """Test handling of unicode decode errors."""
+        test_file = temp_dir / "bad_encoding.md"
+        # Write binary data that's not valid UTF-8
+        test_file.write_bytes(b'\xff\xfe\xfd')
+
+        with pytest.raises(FileOperationError) as exc_info:
+            file_operations.read_markdown_file(test_file)
+
+        assert "Error reading input file" in str(exc_info.value)
+
+
+class TestValidateInputFilePermissions:
+    """Test permission checking in validate_input_file."""
+
+    def test_validate_input_file_no_read_permission(self, temp_dir, mocker):
+        """Test that files without read permission are rejected."""
+        test_file = temp_dir / "test.md"
+        test_file.write_text("# Test")
+
+        # Mock os.access to return False (no read permission)
+        mocker.patch("os.access", return_value=False)
+
+        with pytest.raises(InvalidInputError) as exc_info:
+            file_operations.validate_input_file(str(test_file))
+
+        assert "No read permission" in str(exc_info.value)
