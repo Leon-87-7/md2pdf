@@ -14,3 +14,9 @@ wheels/
 # Test coverage reports
 .coverage
 htmlcov/
+coverage.json
+# Claude Code configuration and artifacts
+.claude/
+
+# Historical documentation
+docs/learning_guides/
