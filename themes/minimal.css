@@ -1,0 +1,158 @@
+@page {
+    size: A4;
+    margin: 3cm;
+}
+
+body {
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #000000;
+    background: #ffffff;
+    padding: 2cm;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    page-break-after: avoid;
+    color: #000000;
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 18pt;
+    text-transform: uppercase;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 0.3em;
+}
+
+.document-section-header {
+    font-size: 16pt;
+    text-transform: uppercase;
+    border-bottom: 2px solid #000000b5;
+    padding-bottom: 0.3em;
+    text-align: right;
+}
+
+h2 {
+    font-size: 14pt;
+    border-bottom: 1px solid #000000;
+    padding-bottom: 0.2em;
+}
+
+h3 {
+    font-size: 12pt;
+}
+
+h4 {
+    font-size: 11pt;
+    text-decoration: underline;
+}
+
+p {
+    margin: 0.8em 0;
+    font-size: 11pt;
+}
+
+ul,
+ol {
+    padding: 0 0 0 2em;
+    margin: 0.8em 0;
+    font-size: 11pt;
+}
+
+li {
+    margin: 0.3em 0;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5em 0;
+    font-size: 10pt;
+    border: 2px solid #000000;
+}
+
+th {
+    background: #000000;
+    color: #ffffff;
+    padding: 8pt;
+    text-align: left;
+    font-weight: bold;
+}
+
+td {
+    padding: 8pt;
+    border: 1px solid #000000;
+}
+
+tr:nth-child(even) td {
+    background-color: #f0f0f0;
+}
+
+code {
+    background: #f5f5f5;
+    padding: 2pt 4pt;
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 10pt;
+    border: 1px solid #cccccc;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #000000;
+    padding: 12pt;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 9pt;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+    border: none;
+}
+
+blockquote {
+    border-left: 3px solid #000000;
+    padding-left: 1em;
+    margin: 1em 0;
+    font-style: italic;
+}
+
+a {
+    color: #000000;
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background: #000000;
+    margin: 2em 0;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #000000;
+}
+
+.page-break {
+    page-break-after: always;
+    break-after: page;
+    height: 0;
+    margin: 2cm 0;
+    padding: 0;
+    border: none;
+}

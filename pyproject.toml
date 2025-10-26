@@ -1,7 +1,39 @@
 [project]
 name = "md2pdf"
-version = "0.1.0"
-description = "A simple markdown to PDF CLI converter"
+version = "0.3.1"
+description = "Convert Markdown files to PDF with beautiful themes"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "markdown>=3.4",
+    "pdfkit>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+]
+
+[project.scripts]
+md2pdf = "md2pdf.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+    "--cov=md2pdf",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]

@@ -6,12 +6,23 @@
 ## Features
 
 - Convert Markdown to PDF with a single command
-- Beautiful default gradient styling with professional typography
+- **Batch processing** - convert multiple files to separate PDFs
+- **Merge mode** - combine multiple Markdown files into a single PDF
+- **5 pre-built themes** (default, dark, light, minimal, professional)
+- **Interactive theme builder** - create custom themes with guided wizard (`--create-theme`)
+- **Theme discovery** with `--theme-list` flag to list all available themes
+- **Accessibility-first** - built-in WCAG contrast checking for custom themes
+- Beautiful default styling with professional typography
 - Support for custom CSS styling
 - Handles tables, code blocks, lists, and images
 - Syntax highlighting for code blocks
 - Table of contents generation
 - Responsive page layout (A4 size with proper margins)
+- Explicit page break support
+- **Preview mode** (`-p`) to auto-open PDFs after generation
+- **Auto-detection** of wkhtmltopdf across all platforms
+- **Modular architecture** with clean separation of concerns
+- **Comprehensive test suite** with 228 tests and 76% code coverage
 
 ## Prerequisites
 
@@ -72,16 +83,91 @@ This creates `document.pdf` in the same directory.
 ### Specify Output File
 
 ```bash
-md2pdf input.md -o output.pdf
+md2pdf input.md -on output.pdf
 ```
+
+### Theme Selection
+
+List all available themes:
+
+```bash
+md2pdf --theme-list
+```
+
+Choose from pre-built themes:
+
+```bash
+md2pdf document.md --theme default       # Default gradient theme
+md2pdf document.md --theme dark          # Dark mode theme
+md2pdf document.md --theme light         # Light theme
+md2pdf document.md --theme minimal       # Minimal clean theme
+md2pdf document.md --theme professional  # Professional business theme
+```
+
+### Creating Custom Themes
+
+Create your own theme interactively with the built-in theme builder:
+
+```bash
+md2pdf --create-theme
+```
+
+The wizard will guide you through creating a custom theme:
+
+```
+╔══════════════════════════════════════════════╗
+║     md2pdf Interactive Theme Builder         ║
+╚══════════════════════════════════════════════╝
+
+Theme name: my_theme
+✓ Name available
+
+Background color [#ffffff]: white
+✓ Using: #ffffff
+
+Text color [#000000]:
+✓ Using: #000000
+✓ Contrast ratio: 21:1 (Excellent - WCAG AAA)
+
+Font family [Arial, sans-serif]: Georgia
+✓ Using: Georgia
+
+Body text size [11pt]: 12
+✓ Using: 12pt
+
+H1 heading color [#2c3e50]: #1a2332
+✓ Using: #1a2332
+✓ Contrast ratio: 12.8:1 (Excellent - WCAG AAA)
+
+... (more prompts) ...
+
+✓ CSS file created: themes/my_theme.css
+✓ Theme ready to use!
+
+Usage:
+  md2pdf document.md --theme my_theme
+```
+
+**Theme Builder Features:**
+- Guided prompts for 10 theme properties (colors, fonts, sizes)
+- Real-time WCAG contrast checking (ensures 4.5:1 minimum ratio)
+- Smart defaults - press Enter to accept
+- Separate controls for H1 vs H2-H6 heading colors
+- Automatic validation and conflict detection
+- Generates complete CSS with all required selectors
+- Works immediately with all conversion modes
+
+**Accessibility:** All generated themes meet WCAG AA standards for color contrast, ensuring your PDFs are readable by everyone.
 
 ### Custom CSS Styling
 
-Use your own CSS file for custom styling:
+Use your own CSS file for custom styling (takes precedence over themes):
 
 ```bash
 md2pdf notes.md --css custom-style.css
 ```
+
+**Note:** If both `--theme` and `--css` are specified, the custom CSS file takes precedence and a warning will be displayed.
 
 ### Preview Mode
 
@@ -93,20 +179,63 @@ md2pdf document.md -p
 
 This will generate the PDF and immediately open it in your system's default PDF viewer.
 
+### Batch Processing
+
+Convert multiple Markdown files to separate PDFs:
+
+```bash
+md2pdf file1.md file2.md file3.md
+```
+
+This creates `file1.pdf`, `file2.pdf`, and `file3.pdf` in the same directories as their source files.
+
+Specify an output directory for all PDFs:
+
+```bash
+md2pdf *.md --output-dir pdfs/
+```
+
+### Merge Mode
+
+Combine multiple Markdown files into a single PDF:
+
+```bash
+md2pdf chapter1.md chapter2.md chapter3.md --merge -on book.pdf
+```
+
+Each source file becomes a section in the merged PDF, with automatic page breaks between sections.
+
+Disable automatic page breaks between merged sections:
+
+```bash
+md2pdf intro.md content.md --merge --no-auto-break -on document.pdf
+```
+
 ### Command Line Options
 
 ```
-usage: md2pdf [-h] [-o OUTPUT] [--css CSS] [-p] [-v] input
+usage: md2pdf [-h] [-on OUTPUT_NAME] [-od OUTPUT_DIR] [-th THEME] [-thl] [--create-theme]
+              [-c CSS] [-p] [-m] [-nab] [-v] [input ...]
 
 positional arguments:
-  input                 Path to the input Markdown file
+  input                 Path to input Markdown file(s). Multiple files triggers batch mode
 
 optional arguments:
   -h, --help            show this help message and exit
-  -o OUTPUT, --output OUTPUT
-                        Output PDF file (default: same name as input)
-  --css CSS             Path to a custom CSS file for styling the PDF
+  -on, --output-name OUTPUT_NAME
+                        Output PDF file (single file mode or merge mode only)
+  -od, --output-dir OUTPUT_DIR
+                        Output directory for batch mode
+  -th, --theme THEME    Theme to use for styling (default: default)
+                        Ignored if --css is specified
+  -thl, --theme-list    List all available themes and exit
+  --create-theme        Launch interactive theme builder wizard and exit
+  -c, --css CSS         Path to a custom CSS file for styling the PDF
+                        Takes precedence over --theme
   -p, --preview         Open the PDF with the default viewer after conversion
+  -m, --merge           Merge multiple input files into a single PDF (requires 2+ files)
+  -nab, --no-auto-break
+                        Disable automatic page breaks between merged documents
   -v, --version         show program's version number and exit
 ```
 
@@ -121,26 +250,108 @@ md2pdf README.md
 ### Example 2: Custom Output Location
 
 ```bash
-md2pdf docs/guide.md -o pdfs/user-guide.pdf
+md2pdf docs/guide.md -on pdfs/user-guide.pdf
 ```
 
-### Example 3: Custom Styling
+### Example 3: Listing Available Themes
+
+```bash
+md2pdf --theme-list
+```
+
+### Example 4: Using Themes
+
+```bash
+md2pdf report.md --theme dark
+md2pdf notes.md --theme minimal
+md2pdf business.md --theme professional
+```
+
+### Example 5: Custom Styling
 
 ```bash
 md2pdf report.md --css styles/corporate.css
 ```
 
-### Example 4: Preview Mode
+### Example 6: Preview Mode
 
 ```bash
 md2pdf document.md -p
 ```
 
-## Default Styling
+### Example 7: Theme with Preview
 
-The default CSS includes:
+```bash
+md2pdf presentation.md --theme dark -p
+```
 
-- Gradient backgrounds with modern color schemes
+### Example 8: Creating a Custom Theme
+
+```bash
+md2pdf --create-theme
+# Follow the interactive prompts to create your theme
+# Then use it:
+md2pdf document.md --theme my_custom_theme
+```
+
+### Example 9: Batch Processing
+
+Convert multiple files to separate PDFs:
+
+```bash
+md2pdf chapter1.md chapter2.md chapter3.md
+```
+
+Convert with output directory:
+
+```bash
+md2pdf docs/*.md --output-dir pdfs/ --theme professional
+```
+
+### Example 10: Merge Files into Single PDF
+
+Merge with automatic page breaks between sections:
+
+```bash
+md2pdf intro.md methods.md results.md conclusion.md --merge -on research_paper.pdf
+```
+
+Merge without page breaks:
+
+```bash
+md2pdf part1.md part2.md --merge --no-auto-break -on continuous_document.pdf --theme dark
+```
+
+## Themes
+
+md2pdf supports multiple pre-built themes located in the `themes/` directory. Each theme is a CSS file that can be selected using the `--theme` flag.
+
+### Discovering Themes
+
+List all available themes:
+
+```bash
+md2pdf --theme-list
+```
+
+Output:
+
+```
+Available themes:
+  - dark
+  - default
+  - light
+  - minimal
+  - professional
+
+Usage: md2pdf document.md --theme <theme-name>
+```
+
+### Available Themes
+
+**default** - Gradient theme with modern styling
+
+- Gradient backgrounds (purple/blue color scheme)
 - Professional typography (Segoe UI font family)
 - Styled headings with gradient backgrounds
 - Code blocks with syntax highlighting
@@ -148,9 +359,55 @@ The default CSS includes:
 - Styled blockquotes and links
 - Image borders and shadows
 
+**dark** - Dark mode theme
+
+- Dark background (#1a1a1a) with light text
+- Optimized for reduced eye strain
+- Subtle styling for code blocks and tables
+- Semi-transparent content boxes
+
+**light** - Clean light theme
+
+- White background with dark text
+- Minimal styling for maximum readability
+- Professional appearance for business documents
+
+**minimal** - Ultra-minimal styling
+
+- Black and white design
+- No backgrounds or decorations
+- Maximum readability
+- Perfect for printing
+
+**professional** - Business-oriented theme
+
+- Clean, corporate styling
+- Traditional typography
+- Suitable for formal reports and documentation
+
+### Theme Directory Structure
+
+Themes are stored in the `themes/` directory:
+
+```
+md2pdf/
+├── md2pdf/
+│   ├── cli.py
+│   ├── core.py
+│   └── ...
+├── themes/
+│   ├── default.css
+│   ├── dark.css
+│   ├── light.css
+│   ├── minimal.css
+│   └── professional.css
+```
+
 ## Custom CSS
 
-To create a custom CSS file, you can start with the default styling and modify it. The CSS should include styles for:
+You can create your own CSS file for complete control over styling. The CSS file takes precedence over any theme.
+
+To create a custom CSS file, you can start with one of the existing themes from the `themes/` directory and modify it. The CSS should include styles for:
 
 - Page layout (`@page`)
 - Body content
@@ -162,6 +419,7 @@ To create a custom CSS file, you can start with the default styling and modify i
 - Blockquotes
 - Links
 - Images
+- Page breaks (`.page-break` class)
 
 ## Supported Markdown Features
 
@@ -215,10 +473,44 @@ And this will be on a third page.
 
 ## Requirements
 
-- Python 3.6+
+- Python 3.9+
 - markdown >= 3.4
 - pdfkit >= 1.0.0
 - wkhtmltopdf (system dependency)
+
+### Development Requirements
+
+- pytest >= 7.4.0
+- pytest-cov >= 4.1.0
+- pytest-mock >= 3.11.0
+
+## Development
+
+### Running Tests
+
+md2pdf includes a comprehensive test suite with **228 tests** (76% coverage) covering all functionality.
+
+Install development dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+Run the test suite:
+
+```bash
+pytest
+```
+
+For more details, see the [Testing Documentation](docs/TESTING.md).
+
+### Architecture
+
+For developers interested in understanding the internal structure, see the [Architecture Documentation](docs/ARCHITECTURE.md) which covers:
+
+- Package structure and module responsibilities
+- Data flow and design principles
+- Testing strategy and future extensions
 
 ## Troubleshooting
 
@@ -247,38 +539,17 @@ Make sure you have write permissions in the output directory.
 
 Avoid using emojis or non-UTF-8 characters in output filenames, as they may cause issues with wkhtmltopdf.
 
-## Future features
+### Theme not found error
 
-### Priority Order:
+If you get an error about a theme not being found:
 
-- Preview Mode (Priority 1) ✅ COMPLETED
-  Auto-open PDF after conversion with -p flag
-
-- Auto-detect wkhtmltopdf (Priority 2) ✅ COMPLETED
-  Automatically find wkhtmltopdf installation across platforms
-  Checks system PATH and common installation locations for Windows, macOS, and Linux
-  Provides helpful platform-specific error messages if not found
-
-- Page Breaks (Priority 3) ✅ COMPLETED
-  Support explicit page break markers in Markdown
-  Supports multiple formats: <!-- pagebreak -->, <!-- page-break -->, case-insensitive
-  Uses CSS page-break-after to create new pages in PDF
-
-- Multiple CSS Themes via --theme (Priority 4) ⏳ NEXT
-  Pre-built themes: gradient (current), minimal, corporate, academic, dark
-  Select with --theme flag
-
-- Batch Processing (Priority 5)
-  Convert multiple files to separate PDFs
-  md2pdf file1.md file2.md file3.md → creates file1.pdf, file2.pdf, file3.pdf
-
-- Multiple Input Files (Priority 6)
-  Combine multiple MD files into single PDF
-  md2pdf chapter1.md chapter2.md --merge -o book.pdf
+1. Ensure the `themes/` directory exists in the same location as `md2pdf.py`
+2. Check that the theme file exists (e.g., `themes/default.css`)
+3. The tool will list available themes if the requested theme is not found
 
 ## License
 
-This project is open source and available for use and modification.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
