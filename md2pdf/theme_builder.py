@@ -70,6 +70,12 @@ def validate_theme_name(name: str) -> None:
     if not name:
         raise ValueError("Theme name cannot be empty")
 
+    # Check for path traversal attempts
+    if "/" in name or "\\" in name or ".." in name:
+        raise ValueError(
+            "Theme name cannot contain path separators or path traversal sequences"
+        )
+
     # Check for valid characters (alphanumeric, dash, underscore)
     if not all(c.isalnum() or c in "-_" for c in name):
         raise ValueError(

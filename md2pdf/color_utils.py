@@ -3,6 +3,8 @@
 import re
 from typing import Tuple
 
+from . import config
+
 
 # CSS named colors (subset of most common colors)
 CSS_NAMED_COLORS = {
@@ -327,13 +329,21 @@ def suggest_accessible_color(
     # If background is light, darken foreground; if dark, lighten foreground
     if bg_luminance > 0.5:
         # Light background, darken foreground
-        for percentage in range(10, 100, 5):
+        for percentage in range(
+            config.COLOR_ADJUSTMENT_START,
+            config.COLOR_ADJUSTMENT_END,
+            config.COLOR_ADJUSTMENT_STEP,
+        ):
             adjusted = suggest_darker(foreground, percentage)
             if calculate_contrast_ratio(adjusted, background) >= target_ratio:
                 return adjusted
     else:
         # Dark background, lighten foreground
-        for percentage in range(10, 100, 5):
+        for percentage in range(
+            config.COLOR_ADJUSTMENT_START,
+            config.COLOR_ADJUSTMENT_END,
+            config.COLOR_ADJUSTMENT_STEP,
+        ):
             adjusted = suggest_lighter(foreground, percentage)
             if calculate_contrast_ratio(adjusted, background) >= target_ratio:
                 return adjusted

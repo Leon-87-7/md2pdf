@@ -33,6 +33,14 @@ PDF_OPTIONS: Dict[str, str] = {
 # Supported markdown file extensions
 SUPPORTED_MARKDOWN_EXTENSIONS: List[str] = [".md", ".markdown", ".txt"]
 
+# Subprocess timeout settings (in seconds)
+SUBPROCESS_TIMEOUT: int = 10
+
+# Color adjustment settings
+COLOR_ADJUSTMENT_START: int = 10
+COLOR_ADJUSTMENT_END: int = 100
+COLOR_ADJUSTMENT_STEP: int = 5
+
 # wkhtmltopdf common installation paths by platform
 WKHTMLTOPDF_PATHS: Dict[str, List[str]] = {
     "Windows": [
