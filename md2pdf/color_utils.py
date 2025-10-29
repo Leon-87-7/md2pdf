@@ -125,9 +125,9 @@ def _parse_hsl(hsl_string: str) -> Tuple[int, int, int]:
     if not (0 <= h <= 360):
         raise ValueError(f"HSL hue must be 0-360, got {h}")
     if not (0 <= s <= 1):
-        raise ValueError(f"HSL saturation must be 0-100%, got {s*100}%")
+        raise ValueError(f"HSL saturation must be 0-100%, got {s * 100}%")
     if not (0 <= l <= 1):
-        raise ValueError(f"HSL lightness must be 0-100%, got {l*100}%")
+        raise ValueError(f"HSL lightness must be 0-100%, got {l * 100}%")
 
     # Convert HSL to RGB
     c = (1 - abs(2 * l - 1)) * s

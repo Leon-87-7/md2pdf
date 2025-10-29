@@ -1,7 +1,7 @@
 """Configuration and constants for md2pdf package."""
 
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 # Version
 __version__: str = "0.3.1"
@@ -17,7 +17,7 @@ THEMES_DIR: Path = PACKAGE_DIR.parent / THEMES_DIR_NAME
 MARKDOWN_EXTENSIONS: List[str] = ["extra", "codehilite", "tables", "toc"]
 
 # PDF generation options for pdfkit/wkhtmltopdf
-PDF_OPTIONS: Dict[str, str] = {
+PDF_OPTIONS: Dict[str, Optional[str]] = {
     "enable-local-file-access": None,
     "encoding": "UTF-8",
     "quiet": "",

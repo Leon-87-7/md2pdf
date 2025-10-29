@@ -3,15 +3,16 @@
 import html
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from . import file_operations, markdown_processor, pdf_engine, theme_manager
 from .exceptions import Md2PdfError, WkhtmltopdfNotFoundError
+from .pdf_engine import PdfKitConfig
 
 
 def _setup_conversion_environment(
     custom_css: Optional[str] = None, theme: str = "default"
-) -> Tuple[Any, str]:
+) -> Tuple[PdfKitConfig, str]:
     """Setup PDF engine and CSS once for efficiency.
 
     This function is shared by all conversion modes (single, batch, merge)
@@ -84,7 +85,7 @@ def _merge_html_bodies(html_bodies: List[Tuple[str, str]], auto_break: bool = Tr
     return "\n".join(merged_parts)
 
 
-def _process_single_file(input_file: str, pdf_config: Any, css_content: str) -> Tuple[Path, str]:
+def _process_single_file(input_file: str, pdf_config: PdfKitConfig, css_content: str) -> Tuple[Path, str]:
     """Read and process a single markdown file to HTML.
 
     This function is shared by all conversion modes to process individual files.

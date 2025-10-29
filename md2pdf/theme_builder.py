@@ -2,13 +2,13 @@
 
 import sys
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 from . import color_utils
 from .theme_manager import get_themes_directory, list_available_themes
 
 
-def print_header():
+def print_header() -> None:
     """Print wizard header."""
     print()
     print("╔══════════════════════════════════════════════╗")
@@ -23,7 +23,7 @@ def print_header():
 def prompt_with_validation(
     prompt_text: str,
     default: str,
-    validator=None,
+    validator: Optional[Callable[[str], None]] = None,
     allow_empty: bool = True,
 ) -> str:
     """Prompt user for input with optional validation.
