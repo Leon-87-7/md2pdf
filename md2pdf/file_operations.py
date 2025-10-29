@@ -164,14 +164,14 @@ def preview_file(pdf_path: Path) -> None:
             subprocess.run(
                 ["open", str(pdf_path)],
                 check=True,
-                timeout=10,  # 10 second timeout
+                timeout=config.SUBPROCESS_TIMEOUT,
             )
         elif system == "Linux":
             # Use timeout to prevent hanging
             subprocess.run(
                 ["xdg-open", str(pdf_path)],
                 check=True,
-                timeout=10,  # 10 second timeout
+                timeout=config.SUBPROCESS_TIMEOUT,
             )
         else:
             print(

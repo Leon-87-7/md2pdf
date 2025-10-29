@@ -78,3 +78,22 @@ class TestConfig:
         for platform, instructions in config.INSTALLATION_INSTRUCTIONS.items():
             assert isinstance(instructions, list)
             assert len(instructions) > 0
+
+    def test_subprocess_timeout(self):
+        """Test subprocess timeout constant."""
+        assert hasattr(config, "SUBPROCESS_TIMEOUT")
+        assert isinstance(config.SUBPROCESS_TIMEOUT, int)
+        assert config.SUBPROCESS_TIMEOUT > 0
+
+    def test_color_adjustment_constants(self):
+        """Test color adjustment range constants."""
+        assert hasattr(config, "COLOR_ADJUSTMENT_START")
+        assert hasattr(config, "COLOR_ADJUSTMENT_END")
+        assert hasattr(config, "COLOR_ADJUSTMENT_STEP")
+
+        assert isinstance(config.COLOR_ADJUSTMENT_START, int)
+        assert isinstance(config.COLOR_ADJUSTMENT_END, int)
+        assert isinstance(config.COLOR_ADJUSTMENT_STEP, int)
+
+        assert config.COLOR_ADJUSTMENT_START < config.COLOR_ADJUSTMENT_END
+        assert config.COLOR_ADJUSTMENT_STEP > 0

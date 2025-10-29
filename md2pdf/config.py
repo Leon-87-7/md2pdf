@@ -1,22 +1,23 @@
 """Configuration and constants for md2pdf package."""
 
 from pathlib import Path
+from typing import Dict, List, Optional
 
 # Version
-__version__ = "0.3.1"
+__version__: str = "0.3.1"
 
 # Paths
-THEMES_DIR_NAME = "themes"
+THEMES_DIR_NAME: str = "themes"
 # Package directory (where this config.py file is located)
-PACKAGE_DIR = Path(__file__).parent
+PACKAGE_DIR: Path = Path(__file__).parent
 # Themes directory is relative to package directory
-THEMES_DIR = PACKAGE_DIR.parent / THEMES_DIR_NAME
+THEMES_DIR: Path = PACKAGE_DIR.parent / THEMES_DIR_NAME
 
 # Markdown extensions for python-markdown library
-MARKDOWN_EXTENSIONS = ["extra", "codehilite", "tables", "toc"]
+MARKDOWN_EXTENSIONS: List[str] = ["extra", "codehilite", "tables", "toc"]
 
 # PDF generation options for pdfkit/wkhtmltopdf
-PDF_OPTIONS = {
+PDF_OPTIONS: Dict[str, Optional[str]] = {
     "enable-local-file-access": None,
     "encoding": "UTF-8",
     "quiet": "",
@@ -30,10 +31,18 @@ PDF_OPTIONS = {
 }
 
 # Supported markdown file extensions
-SUPPORTED_MARKDOWN_EXTENSIONS = [".md", ".markdown", ".txt"]
+SUPPORTED_MARKDOWN_EXTENSIONS: List[str] = [".md", ".markdown", ".txt"]
+
+# Subprocess timeout settings (in seconds)
+SUBPROCESS_TIMEOUT: int = 10
+
+# Color adjustment settings
+COLOR_ADJUSTMENT_START: int = 10
+COLOR_ADJUSTMENT_END: int = 100
+COLOR_ADJUSTMENT_STEP: int = 5
 
 # wkhtmltopdf common installation paths by platform
-WKHTMLTOPDF_PATHS = {
+WKHTMLTOPDF_PATHS: Dict[str, List[str]] = {
     "Windows": [
         "C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe",
         "C:/Program Files (x86)/wkhtmltopdf/bin/wkhtmltopdf.exe",
@@ -52,7 +61,7 @@ WKHTMLTOPDF_PATHS = {
 }
 
 # Installation instructions by platform
-INSTALLATION_INSTRUCTIONS = {
+INSTALLATION_INSTRUCTIONS: Dict[str, List[str]] = {
     "Windows": [
         "  - Download from: https://wkhtmltopdf.org/downloads.html",
         "  - Install to default location (C:/Program Files/wkhtmltopdf/)",

@@ -52,8 +52,6 @@ class TestValidateThemeName:
             "theme$",
             "theme!",
             "theme.css",
-            "theme/path",
-            "theme\\path",
         ]
 
         for name in invalid_names:
@@ -61,6 +59,22 @@ class TestValidateThemeName:
                 theme_builder.validate_theme_name(name)
 
             assert "letters, numbers, hyphens, and underscores" in str(exc_info.value)
+
+    def test_invalid_theme_name_path_traversal(self):
+        """Test that theme names with path traversal attempts are rejected."""
+        invalid_names = [
+            "theme/path",
+            "theme\\path",
+            "../theme",
+            "..\\theme",
+            "theme/../other",
+        ]
+
+        for name in invalid_names:
+            with pytest.raises(ValueError) as exc_info:
+                theme_builder.validate_theme_name(name)
+
+            assert "path separators" in str(exc_info.value) or "path traversal" in str(exc_info.value)
 
     def test_invalid_theme_name_existing(self, mocker):
         """Test that existing theme names are rejected."""

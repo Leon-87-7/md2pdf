@@ -2,13 +2,13 @@
 
 import sys
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 from . import color_utils
 from .theme_manager import get_themes_directory, list_available_themes
 
 
-def print_header():
+def print_header() -> None:
     """Print wizard header."""
     print()
     print("╔══════════════════════════════════════════════╗")
@@ -23,7 +23,7 @@ def print_header():
 def prompt_with_validation(
     prompt_text: str,
     default: str,
-    validator=None,
+    validator: Optional[Callable[[str], None]] = None,
     allow_empty: bool = True,
 ) -> str:
     """Prompt user for input with optional validation.
@@ -69,6 +69,12 @@ def validate_theme_name(name: str) -> None:
     """
     if not name:
         raise ValueError("Theme name cannot be empty")
+
+    # Check for path traversal attempts
+    if "/" in name or "\\" in name or ".." in name:
+        raise ValueError(
+            "Theme name cannot contain path separators or path traversal sequences"
+        )
 
     # Check for valid characters (alphanumeric, dash, underscore)
     if not all(c.isalnum() or c in "-_" for c in name):

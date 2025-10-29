@@ -3,6 +3,8 @@
 import re
 from typing import Tuple
 
+from . import config
+
 
 # CSS named colors (subset of most common colors)
 CSS_NAMED_COLORS = {
@@ -123,9 +125,9 @@ def _parse_hsl(hsl_string: str) -> Tuple[int, int, int]:
     if not (0 <= h <= 360):
         raise ValueError(f"HSL hue must be 0-360, got {h}")
     if not (0 <= s <= 1):
-        raise ValueError(f"HSL saturation must be 0-100%, got {s*100}%")
+        raise ValueError(f"HSL saturation must be 0-100%, got {s * 100}%")
     if not (0 <= l <= 1):
-        raise ValueError(f"HSL lightness must be 0-100%, got {l*100}%")
+        raise ValueError(f"HSL lightness must be 0-100%, got {l * 100}%")
 
     # Convert HSL to RGB
     c = (1 - abs(2 * l - 1)) * s
@@ -327,13 +329,21 @@ def suggest_accessible_color(
     # If background is light, darken foreground; if dark, lighten foreground
     if bg_luminance > 0.5:
         # Light background, darken foreground
-        for percentage in range(10, 100, 5):
+        for percentage in range(
+            config.COLOR_ADJUSTMENT_START,
+            config.COLOR_ADJUSTMENT_END,
+            config.COLOR_ADJUSTMENT_STEP,
+        ):
             adjusted = suggest_darker(foreground, percentage)
             if calculate_contrast_ratio(adjusted, background) >= target_ratio:
                 return adjusted
     else:
         # Dark background, lighten foreground
-        for percentage in range(10, 100, 5):
+        for percentage in range(
+            config.COLOR_ADJUSTMENT_START,
+            config.COLOR_ADJUSTMENT_END,
+            config.COLOR_ADJUSTMENT_STEP,
+        ):
             adjusted = suggest_lighter(foreground, percentage)
             if calculate_contrast_ratio(adjusted, background) >= target_ratio:
                 return adjusted

@@ -23,3 +23,6 @@ coverage.json
 
 # Historical documentation
 docs/learning_guides/
+
+# Legacy files
+md2pdf_old.py
